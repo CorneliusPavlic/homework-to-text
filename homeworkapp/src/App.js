@@ -3,6 +3,7 @@ import {createCanvas} from 'canvas';
 import {jscanify} from 'jscanify';
 
 function App() {
+  let video
   const scanner = new jscanify();
   const canvas = createCanvas(500,500);
   const result = createCanvas(500,500);
