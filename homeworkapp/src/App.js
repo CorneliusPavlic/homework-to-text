@@ -26,7 +26,8 @@ export const Scanner = () => {
               const intervalPtr = setInterval(() => {
                 if(displayFile){
                   clearInterval(intervalPtr);
-                  const resultImage = scanner.extractPaper(video, 500, 1000);
+                  const image = canvas.toDataURL('image/png')
+                  const resultImage = scanner.extractPaper(image, 500, 1000);
                   resultCtx.drawImage(resultImage)  
                 }
                 else{
