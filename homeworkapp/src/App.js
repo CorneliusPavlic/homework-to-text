@@ -19,6 +19,7 @@ export const Scanner = () => {
     const video = document.getElementById('video');
     
     loadOpenCv(() => {
+      try{
       navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         video.srcObject = stream;
         video.onloadedmetadata = () => {
@@ -26,9 +27,8 @@ export const Scanner = () => {
           const intervalPtr = setInterval(() => {
                 if(displayFile.current){
                   clearInterval(intervalPtr);
-                  const image = canvas.toDataURL('image/png')
-                  const resultImage = scanner.extractPaper(image, 500, 1000);
-                  resultCtx.drawImage(resultImage)  
+                  const resultImage = scanner.extractPaper(canvas, 500, 647);
+                  resultCtx.drawImage(resultImage,0,0, canvas.width, canvas.height);
                 }
                 else{
                 canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -37,7 +37,10 @@ export const Scanner = () => {
                 }
               }, 10);
         };
-      });
+      });}
+      catch(err){
+        console.log(err);
+      }
   });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -83,6 +86,9 @@ export const Scanner = () => {
               <canvas id="canvas"></canvas>
               <canvas id="result"></canvas>
             </div>
+          <form>
+          <input type='file' id='myFile' name="filename"/>
+          </form>
           <button onClick={handleDisplayFileClick}>Looks Good?</button>
         </div>
         <div ref={containerRef} id="result-container"></div>
