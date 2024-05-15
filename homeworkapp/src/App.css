@@ -1,13 +1,20 @@
 #canvas {
-  height: 600px;
-
+  height:0px;
 }
 
 #video {
-  height:0;
+  height:0px;
 }
 
 #result{
-  top:0px;
-  position: absolute;
+  height:480px;
+  width: 680px;
+}
+
+.result-canvas-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 65vh;
+  width: 100%;
 }

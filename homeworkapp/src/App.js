@@ -11,18 +11,21 @@ export const Scanner = () => {
   useEffect(() => {
     // eslint-disable-next-line no-undef
     const scanner = new jscanify();
-    const canvasCtx = document.getElementById('canvas').getContext("2d");
-    const resultCtx = document.getElementById('result').getContext("2d");
+    const canvas = document.getElementById('canvas');
+    const canvasCtx = canvas.getContext("2d")
+    const result = document.getElementById('result');
+    const resultCtx = result.getContext("2d");
     const video = document.getElementById('video');
+
     loadOpenCv(() => {
       navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         video.srcObject = stream;
         video.onloadedmetadata = () => {
           video.play();
               setInterval(() => {
-                canvasCtx.drawImage(video, 500, 500);
-                const resultCanvas = scanner.highlightPaper(document.getElementById('canvas'));
-                resultCtx.drawImage(resultCanvas, 500, 500);
+                canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const resultCanvas = scanner.highlightPaper(canvas);
+                resultCtx.drawImage(resultCanvas, 0, 0);
               }, 10);
         };
       });
@@ -59,9 +62,11 @@ export const Scanner = () => {
               <h2>Loading OpenCV...</h2>
             </div>
           )}
+          <div className='result-canvas-div'>
           <video id="video"></video> 
           <canvas id="canvas"></canvas>
           <canvas id="result"></canvas>
+          </div>
         </div>
         <div ref={containerRef} id="result-container"></div>
       </div>
