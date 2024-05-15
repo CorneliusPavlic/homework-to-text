@@ -8,7 +8,7 @@
 
 #result{
   height:480px;
-  width: 680px;
+  width:640px;
 }
 
 .result-canvas-div {
@@ -17,4 +17,9 @@
   align-items: center;
   height: 65vh;
   width: 100%;
+}
+
+#hiddenImage {
+  object-fit:contain;
+  height:0px;
 }
