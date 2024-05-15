@@ -6,7 +6,6 @@ export const Scanner = () => {
   const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
   const [loadedOpenCV, setLoadedOpenCV] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(undefined);
 
   useEffect(() => {
     // eslint-disable-next-line no-undef
@@ -31,7 +30,7 @@ export const Scanner = () => {
       });
   });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedImage]);
+  }, []);
 
   const loadOpenCv = (onComplete) => {
     const isScriptPresent = !!document.getElementById('open-cv');
