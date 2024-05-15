@@ -20,9 +20,9 @@ export const Scanner = () => {
         video.onloadedmetadata = () => {
           video.play();
               setInterval(() => {
-                canvasCtx.drawImage(video, 0, 0);
+                canvasCtx.drawImage(video, 500, 500);
                 const resultCanvas = scanner.highlightPaper(document.getElementById('canvas'));
-                resultCtx.drawImage(resultCanvas, 0, 0);
+                resultCtx.drawImage(resultCanvas, 500, 500);
               }, 10);
         };
       });
