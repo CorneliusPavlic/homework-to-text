@@ -5,14 +5,16 @@ import './App.css'
 export const Scanner = () => {
   const containerRef = useRef(null);
   const displayFile = useRef(false);
-  const pdf = useRef(new jsPDF());
+  const currentName = useRef('');
   const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
   const [loadedOpenCV, setLoadedOpenCV] = useState(false);
   const [resetEffect, setResetEffect] = useState(0);
   const [formData, setFormData] = useState([]); // Use state to manage FormData
-    
-  
+  const [fileNames, setFileNames] = useState([]); // Store the names of the files
+  const [fileData, setFileData] = useState([]); // Store the actual file data 
+
+
   useEffect(() => {
     // eslint-disable-next-line no-undef
     const scanner = new jscanify();
@@ -83,38 +85,47 @@ export const Scanner = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetEffect]);
 
-
-
   const addAnotherFile = () => {
-      // only jpeg is supported by jsPDF
+    // only jpeg is supported by jsPDF
     var imgData = document.getElementById('result').toDataURL("image/jpeg", 1.0);
     setFormData(prevState => [...prevState, imgData]);
+
+    // Create a unique filename (you can modify this logic)
+    const filename = currentName.current;
+    setFileNames(prevState => [...prevState, filename]);
+
+    // Optionally store the actual image data
+    setFileData(prevState => [...prevState, imgData]);
+
     setResetEffect(resetEffect + 1);
-  }
+  };
 
   const handleDisplayVideoSnapshotClick = () => {
     displayFile.current = true;
-  }
+  };
 
   const sendToFlask = () => {
     console.log(formData);
-  }
+  };
 
   const handleFileUpload = (event) => {
-    
-    // Get the selected file
     const file = event.target.files[0];
-    if (file.type === 'application/pdf'){
-        return
+    if (file.type === 'application/pdf') {
+      return;
     }
+    currentName.current = file.name;
+    document.getElementById('hiddenImage').src = URL.createObjectURL(file);
 
-    // Display the image (assuming 'hiddenImage' is an <img> tag in your HTML)
-    document.getElementById('hiddenImage').src = URL.createObjectURL(file); 
-    // Append the image file to FormData
-  
-  
-    // Now you can send formData to your Flask backend 
+    // ... (Rest of your file handling code)
   };
+
+  const deleteFile = (index) => {
+    // Update formData, fileNames, and fileData by removing the item at the given index
+    setFormData(formData.filter((_, i) => i !== index));
+    setFileNames(fileNames.filter((_, i) => i !== index));
+    setFileData(fileData.filter((_, i) => i !== index));
+  };
+
   const loadOpenCv = (onComplete) => {
     const isScriptPresent = !!document.getElementById('open-cv');
     if (isScriptPresent || loadedOpenCV) {
@@ -135,7 +146,6 @@ export const Scanner = () => {
     }
   };
 
-
   return (
     <>
       <div className="scanner-container">
@@ -145,18 +155,28 @@ export const Scanner = () => {
               <h2>Loading OpenCV...</h2>
             </div>
           )}
-           <div className='result-canvas-div'>
-              <video id="video"></video> 
-              <canvas id="canvas"></canvas>
-              <canvas id="result"></canvas>
-              <img id='hiddenImage' alt=''/>
-            </div>
+          <div className='result-canvas-div'>
+            <video id="video"></video>
+            <canvas id="canvas"></canvas>
+            <canvas id="result"></canvas>
+            <img id='hiddenImage' alt=''/>
+          </div>
           <form>
-          <input type='file' id='myFile' name="filename" onChange={handleFileUpload}/>
+            <input type='file' id='myFile' name="filename" onChange={handleFileUpload}/>
           </form>
           <button onClick={handleDisplayVideoSnapshotClick}>Looks Good?</button>
           <button onClick={addAnotherFile}>Add this File</button>
           <button onClick={sendToFlask}>Send off to super cool AI</button>
+
+          {/* Display the names of the files */}
+          <ul>
+            {fileNames.map((fileName, index) => (
+              <li key={index}>
+                {fileName}
+                <button onClick={() => deleteFile(index)}>Delete</button>
+              </li>
+            ))}
+          </ul>
         </div>
         <div ref={containerRef} id="result-container"></div>
       </div>
@@ -164,5 +184,4 @@ export const Scanner = () => {
   );
 };
 
-
-export default Scanner;
+export default Scanner
