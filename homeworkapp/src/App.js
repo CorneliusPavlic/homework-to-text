@@ -6,7 +6,7 @@ export const Scanner = () => {
   const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
   const [loadedOpenCV, setLoadedOpenCV] = useState(false);
-  const [displayFile, setDisplayFile] = useState(false);
+  let displayFile = false;
     
   
   useEffect(() => {
@@ -43,7 +43,7 @@ export const Scanner = () => {
 
 
   const handleDisplayFileClick = () => {
-    setDisplayFile(!displayFile);
+    displayFile = true;
   }
 
 
