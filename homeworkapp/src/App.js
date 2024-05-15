@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-
+import './App.css'
 
 export const Scanner = () => {
   const containerRef = useRef(null);
