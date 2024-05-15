@@ -6,7 +6,7 @@ export const Scanner = () => {
   const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
   const [loadedOpenCV, setLoadedOpenCV] = useState(false);
-  let displayFile = false;
+  const displayFile = useRef(false);
     
   
   useEffect(() => {
@@ -22,9 +22,9 @@ export const Scanner = () => {
       navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         video.srcObject = stream;
         video.onloadedmetadata = () => {
-              video.play();
-              const intervalPtr = setInterval(() => {
-                if(displayFile){
+          video.play();
+          const intervalPtr = setInterval(() => {
+                if(displayFile.current){
                   clearInterval(intervalPtr);
                   const resultImage = scanner.extractPaper(video, 500, 1000);
                   resultCtx.drawImage(resultImage)  
@@ -43,7 +43,7 @@ export const Scanner = () => {
 
 
   const handleDisplayFileClick = () => {
-    displayFile = true;
+    displayFile.current = true;
   }
 
 
@@ -82,7 +82,7 @@ export const Scanner = () => {
               <canvas id="canvas"></canvas>
               <canvas id="result"></canvas>
             </div>
-          <button onClick={handleDisplayFileClick()}>Looks Good?</button>
+          <button onClick={handleDisplayFileClick}>Looks Good?</button>
         </div>
         <div ref={containerRef} id="result-container"></div>
       </div>
