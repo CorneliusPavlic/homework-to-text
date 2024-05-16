@@ -5,6 +5,7 @@ import './App.css'
 export const Scanner = () => {
   const containerRef = useRef(null);
   const displayFile = useRef(false);
+  const isRunning = useRef(false);
   const currentName = useRef('');
   const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
@@ -23,61 +24,43 @@ export const Scanner = () => {
     const result = document.getElementById('result');
     result.height = '0px'
     const resultCtx = result.getContext("2d");
-    const video = document.getElementById('video');
-    document.getElementById('hiddenImage').src = '';
     const testAgainst = document.getElementById('hiddenImage').src;
     loadOpenCv(() => {
-      try{  
-        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-          video.srcObject = stream;
-          video.onloadedmetadata = () => {
-            video.play();
-            const intervalPtr = setInterval(() => {
-              if(displayFile.current){
-                console.log("bye")
-                clearInterval(intervalPtr);
-                canvas.width = "640px";
-                  canvas.height = "480px";
-                  result.width =  "640px";
-                  result.height = "480px";
-                const resultImage = scanner.extractPaper(canvas, 500, 647);
-                resultCtx.drawImage(resultImage,0,0, canvas.width, canvas.height);
+       try{  
+         isRunning.current = true;
+         const intervalPtr = setInterval(() => {
+              console.log("Hello")
+               if (document.getElementById('hiddenImage').src !== testAgainst){
+                  let image = document.getElementById("hiddenImage");
+                  if(!image.complete) {
+                  setTimeout(()=>{
+                        clearInterval(intervalPtr);
+                        canvas.width = image.naturalWidth;
+                        canvas.height = image.naturalHeight;
+                        result.width = image.naturalWidth;
+                        result.height = image.naturalHeight;
+                        canvasCtx.drawImage(image, 0,0,image.naturalWidth, image.naturalHeight)
+                        const resultImage = scanner.extractPaper(canvas, 500, 1000);
+                        resultCtx.drawImage(resultImage,0,0, canvas.width, canvas.height);
+                        isRunning.current = false;
+
+                      }, 1000);
+                  }
+                  else {
+                    clearInterval(intervalPtr);
+                    canvas.width = image.naturalWidth;
+                    canvas.height = image.naturalHeight;
+                    result.width = image.naturalWidth;
+                    result.height = image.naturalHeight;
+                    canvasCtx.drawImage(image, 0,0,image.naturalWidth, image.naturalHeight)
+                    console.log(canvas.width);
+                    const resultImage = scanner.extractPaper(canvas, 500, 1000);
+                    resultCtx.drawImage(resultImage,0,0, canvas.width, canvas.height);
+                    isRunning.current = false;
+                  }
               }
-              else if (document.getElementById('hiddenImage').src !== testAgainst){
-                let image = document.getElementById("hiddenImage");
-                if(!image.complete) setTimeout(()=>{
-                  clearInterval(intervalPtr);
-                  canvas.width = image.naturalWidth;
-                  canvas.height = image.naturalHeight;
-                  result.width = image.naturalWidth;
-                  result.height = image.naturalHeight;
-                  canvasCtx.drawImage(image, 0,0,image.naturalWidth, image.naturalHeight)
-                  console.log(canvas.width);
-                  const resultImage = scanner.extractPaper(canvas, 500, 647);
-                  console.log("this should be right after the error")
-                  resultCtx.drawImage(resultImage,0,0, canvas.width, canvas.height);
-                }, 1000);
-                else {
-                  clearInterval(intervalPtr);
-                  canvas.width = image.naturalWidth;
-                  canvas.height = image.naturalHeight;
-                  result.width = image.naturalWidth;
-                  result.height = image.naturalHeight;
-                  canvasCtx.drawImage(image, 0,0,image.naturalWidth, image.naturalHeight)
-                  console.log(canvas.width);
-                  const resultImage = scanner.extractPaper(canvas, 500, 647);
-                  console.log("this should be right after the error")
-                  resultCtx.drawImage(resultImage,0,0, canvas.width, canvas.height);
-                }
-                }
-                else{
-                canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const resultCanvas = scanner.highlightPaper(canvas);
-                resultCtx.drawImage(resultCanvas, 0, 0); 
-                }
-              }, 10);
-        };
-      });}
+            }, 10);
+      }
       catch(err){
         console.log(err);
       }
@@ -109,14 +92,16 @@ export const Scanner = () => {
   };
 
   const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file.type === 'application/pdf') {
-      return;
-    }
-    currentName.current = file.name;
-    document.getElementById('hiddenImage').src = URL.createObjectURL(file);
-
-    // ... (Rest of your file handling code)
+    if(!isRunning.current) setResetEffect(resetEffect + 1);
+    setTimeout(()=> {
+      const file = event.target.files[0];
+      console.log(file)
+      if (file.type === 'application/pdf') {
+        return;
+      }
+      currentName.current = file.name;
+      document.getElementById('hiddenImage').src = URL.createObjectURL(file);
+    }, 50)
   };
 
   const deleteFile = (index) => {
@@ -156,7 +141,6 @@ export const Scanner = () => {
             </div>
           )}
           <div className='result-canvas-div'>
-            <video id="video"></video>
             <canvas id="canvas"></canvas>
             <canvas id="result"></canvas>
             <img id='hiddenImage' alt=''/>
@@ -164,7 +148,6 @@ export const Scanner = () => {
           <form>
             <input type='file' id='myFile' name="filename" onChange={handleFileUpload}/>
           </form>
-          <button onClick={handleDisplayVideoSnapshotClick}>Looks Good?</button>
           <button onClick={addAnotherFile}>Add this File</button>
           <button onClick={sendToFlask}>Send off to super cool AI</button>
 
