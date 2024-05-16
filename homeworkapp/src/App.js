@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import {jsPDF} from 'jspdf'
 import './App.css'
 
 export const Scanner = () => {
+
   const containerRef = useRef(null);
-  const displayFile = useRef(false);
+
+  //true while Interval is running
   const isRunning = useRef(false);
+
+  //saves name of current uploaded file.
   const currentName = useRef('');
   const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
@@ -17,6 +20,7 @@ export const Scanner = () => {
 
 
   useEffect(() => {
+    //creates new scanner to detect edges of the image.
     // eslint-disable-next-line no-undef
     const scanner = new jscanify();
     const canvas = document.getElementById('canvas');
@@ -82,9 +86,6 @@ export const Scanner = () => {
     setResetEffect(resetEffect + 1);
   };
 
-  const handleDisplayVideoSnapshotClick = () => {
-    displayFile.current = true;
-  };
 
   const sendToFlask = () => {
     console.log(formData);
