@@ -157,11 +157,12 @@ export const Scanner = () => {
             <canvas id="result"></canvas>
             <img id='hiddenImage' alt=''/>
           </div>
-          <form>
+          <form action='/api/sendFiles' method="post" enctype='multipart/form-data'>
             <input type='file' id='myFile' name="filename" onChange={handleFileUpload}/>
+            <input type='submit' onClick={sendToFlask}/>
           </form>
           <button onClick={addAnotherFile}>Add this File</button>
-          <button onClick={sendToFlask}>Send off to super cool AI</button>
+          <form/>
 
           {/* Display the names of the files */}
           <ul>
