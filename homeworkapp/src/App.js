@@ -23,60 +23,53 @@ export const Scanner = () => {
     //creates new scanner to detect edges of the image.
     // eslint-disable-next-line no-undef
     const scanner = new jscanify();
-    const canvas = document.getElementById('canvas');
-    const canvasCtx = canvas.getContext("2d")
+
+    //canvas
     const result = document.getElementById('result');
     result.height = '0px'
+    //canvas context to draw on.
     const resultCtx = result.getContext("2d");
+    //checks to see if there has been a new image uploaded.
     const testAgainst = document.getElementById('hiddenImage').src;
+
+    //loads the open CV library then sets an interval to check if an image has been uploaded. If it has it displays it and aborts the interval.
     loadOpenCv(() => {
-       try{  
          isRunning.current = true;
          const intervalPtr = setInterval(() => {
                if (document.getElementById('hiddenImage').src !== testAgainst){
                   let image = document.getElementById("hiddenImage");
                   if(!image.complete) {
                   setTimeout(()=>{
-                        clearInterval(intervalPtr);
-                        canvas.width = image.naturalWidth;
-                        canvas.height = image.naturalHeight;
-                        result.width = image.naturalWidth;
-                        result.height = image.naturalHeight;
-                        canvasCtx.drawImage(image, 0,0,image.naturalWidth, image.naturalHeight)
-                        const resultImage = scanner.extractPaper(canvas, 500, 1000);
-                        resultCtx.drawImage(resultImage,0,0, canvas.width, canvas.height);
-                        isRunning.current = false;
-
+                      extractFileFromCanvas(intervalPtr,result,resultCtx,image,scanner)
                       }, 1000);
                   }
                   else {
-                    clearInterval(intervalPtr);
-                    canvas.width = image.naturalWidth;
-                    canvas.height = image.naturalHeight;
-                    result.width = image.naturalWidth;
-                    result.height = image.naturalHeight;
-                    canvasCtx.drawImage(image, 0,0,image.naturalWidth, image.naturalHeight)
-                    console.log(canvas.width);
-                    const resultImage = scanner.extractPaper(canvas, 500, 1000);
-                    resultCtx.drawImage(resultImage,0,0, canvas.width, canvas.height);
-                    isRunning.current = false;
+                    extractFileFromCanvas(intervalPtr,result,resultCtx,image,scanner)
                   }
               }
             }, 10);
-      }
-      catch(err){
-        console.log(err);
-      }
-  });
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetEffect]);
 
+
+  //Stops the interval, sets the canvas to the size of the image, then draws the image on the canvas, extracts the paper from it and draws the result to canvas
+  const extractFileFromCanvas = (intervalPtr, result, resultCtx,image, scanner) => {
+    clearInterval(intervalPtr);
+    result.width = image.naturalWidth;
+    result.height = image.naturalHeight;
+    resultCtx.drawImage(image, 0,0,image.naturalWidth, image.naturalHeight)
+    const resultImage = scanner.extractPaper(result, 500, 1000);
+    resultCtx.drawImage(resultImage,0,0, result.width, result.height);
+    isRunning.current = false;
+  }
+
+  //sets new form and file data when the user adds the file to queue.  
   const addAnotherFile = () => {
-    // only jpeg is supported by jsPDF
     var imgData = document.getElementById('result').toDataURL("image/jpeg", 1.0);
     setFormData(prevState => [...prevState, imgData]);
 
-    // Create a unique filename (you can modify this logic)
+
     const filename = currentName.current;
     setFileNames(prevState => [...prevState, filename]);
 
@@ -87,15 +80,17 @@ export const Scanner = () => {
   };
 
 
+//Will send the information to the backend for processing.
   const sendToFlask = () => {
     console.log(formData);
   };
 
+   
+  //resets the interval if it isn't running, and sets the hidden image to be used by the canvas.
   const handleFileUpload = (event) => {
     if(!isRunning.current) setResetEffect(resetEffect + 1);
     setTimeout(()=> {
       const file = event.target.files[0];
-      console.log(file)
       if (file.type === 'application/pdf') {
         return;
       }
@@ -104,6 +99,8 @@ export const Scanner = () => {
     }, 50)
   };
 
+
+  //removes file from all relevant places. 
   const deleteFile = (index) => {
     // Update formData, fileNames, and fileData by removing the item at the given index
     setFormData(formData.filter((_, i) => i !== index));
@@ -111,6 +108,9 @@ export const Scanner = () => {
     setFileData(fileData.filter((_, i) => i !== index));
   };
 
+
+
+//adds openCV script if it doesn't exist then calls passed function.
   const loadOpenCv = (onComplete) => {
     const isScriptPresent = !!document.getElementById('open-cv');
     if (isScriptPresent || loadedOpenCV) {
@@ -141,7 +141,6 @@ export const Scanner = () => {
             </div>
           )}
           <div className='result-canvas-div'>
-            <canvas id="canvas"></canvas>
             <canvas id="result"></canvas>
             <img id='hiddenImage' alt=''/>
           </div>
