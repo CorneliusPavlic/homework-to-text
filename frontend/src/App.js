@@ -98,7 +98,7 @@ export const Scanner = () => {
     });
     console.log(formData);
     try {
-      const response = await fetch('/api/upload', { // Replace with your Flask endpoint
+      const response = await fetch('/api/sendFiles', { // Replace with your Flask endpoint
         method: 'POST',
         body: formData
       });
