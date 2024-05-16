@@ -13,7 +13,7 @@ export const Scanner = () => {
   const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
   const [loadedOpenCV, setLoadedOpenCV] = useState(false);
-  const [resetEffect, setResetEffect] = useState(0);
+  const [resetEffect, setResetEffect] = useState(0); //used to run useEffect when needed.
   const [formData, setFormData] = useState([]); // Use state to manage FormData
   const [fileNames, setFileNames] = useState([]); // Store the names of the files
   const [fileData, setFileData] = useState([]); // Store the actual file data 
@@ -110,7 +110,7 @@ export const Scanner = () => {
 
 
 
-//adds openCV script if it doesn't exist then calls passed function.
+//adds openCV script if it doesn't exist, then calls passed function.
   const loadOpenCv = (onComplete) => {
     const isScriptPresent = !!document.getElementById('open-cv');
     if (isScriptPresent || loadedOpenCV) {
