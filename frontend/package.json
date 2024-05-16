@@ -1,5 +1,6 @@
 {
   "name": "homeworkapp",
+  "proxy": "https://localhost:5000",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

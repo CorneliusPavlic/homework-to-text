@@ -76,7 +76,7 @@ export const Scanner = () => {
     }
     else{
       document.getElementById('result').toBlob((blob) => {
-        setFormData(prevState => [...prevState, blob]);
+        setFormData(prevState => [...prevState, new File([blob], currentName.current, {type:"image/jpeg"}), 'image/jpeg']);
       },"image/jpeg", 1.0);
     }
 
@@ -96,16 +96,19 @@ export const Scanner = () => {
     fileData.forEach(file => {
       formData.append('file', file); // Assuming 'file' is the expected field name
     });
-    console.log(formData);
     try {
-      const response = await fetch('/api/sendFiles', { // Replace with your Flask endpoint
-        method: 'POST',
-        body: formData
-      });
-
+      const response = await fetch('http://localhost:5000/api/sendFiles', { // Replace with your Flask endpoint
+      mode: 'cors',
+      method: 'POST',
+      body: formData,
+    });
+    console.log(response)
       if (response.ok) {
+        const data = await response.text(); // Get the response as text
         console.log('File uploaded successfully!');
-        // Handle success, e.g., clear the input, display a message
+        // Display the response
+        const resultElement = document.getElementById('math'); // Assuming you have an element to display the results
+        resultElement.textContent = data;
       } else {
         console.error('Upload failed:', response.statusText);
         // Handle errors, e.g., display an error message
@@ -182,7 +185,6 @@ export const Scanner = () => {
           </div>
           <form onSubmit={sendToFlask}>
             <input type='file' id='myFile' name="filename" onChange={handleFileUpload}/>
-            <input type='submit' onClick={sendToFlask}/>
           </form>
           <button onClick={addAnotherFile}>Add this File</button>
           <form/>
@@ -197,6 +199,7 @@ export const Scanner = () => {
             ))}
           </ul>
         </div>
+        <p id='math'></p>
         <div ref={containerRef} id="result-container"></div>
       </div>
     </>
