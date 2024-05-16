@@ -10,13 +10,17 @@ export const Scanner = () => {
 
   //saves name of current uploaded file.
   const currentName = useRef('');
+
+  //stores value of files for file types that are not images.
+  const currentFile = useRef('');
+
+
   const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
   const [loadedOpenCV, setLoadedOpenCV] = useState(false);
   const [resetEffect, setResetEffect] = useState(0); //used to run useEffect when needed.
   const [formData, setFormData] = useState([]); // Use state to manage FormData
   const [fileNames, setFileNames] = useState([]); // Store the names of the files
-  const [fileData, setFileData] = useState([]); // Store the actual file data 
 
 
   useEffect(() => {
@@ -66,15 +70,18 @@ export const Scanner = () => {
 
   //sets new form and file data when the user adds the file to queue.  
   const addAnotherFile = () => {
-    var imgData = document.getElementById('result').toDataURL("image/jpeg", 1.0);
-    setFormData(prevState => [...prevState, imgData]);
+    if(currentFile.current !== '') {
+      setFormData(prevState => [...prevState, currentFile.current]);
+      currentFile.current = '';
+    }
+    else{
+      var imgData = document.getElementById('result').toDataURL("image/jpeg", 1.0);
+      setFormData(prevState => [...prevState, imgData]);
+    }
 
 
     const filename = currentName.current;
     setFileNames(prevState => [...prevState, filename]);
-
-    // Optionally store the actual image data
-    setFileData(prevState => [...prevState, imgData]);
 
     setResetEffect(resetEffect + 1);
   };
@@ -91,11 +98,18 @@ export const Scanner = () => {
     if(!isRunning.current) setResetEffect(resetEffect + 1);
     setTimeout(()=> {
       const file = event.target.files[0];
-      if (file.type === 'application/pdf') {
-        return;
-      }
       currentName.current = file.name;
-      document.getElementById('hiddenImage').src = URL.createObjectURL(file);
+
+      if (file.type === 'application/pdf') {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = function () {
+          currentFile.current = reader.result;
+        } 
+      }
+      else{
+        document.getElementById('hiddenImage').src = URL.createObjectURL(file);
+      }
     }, 50)
   };
 
@@ -105,7 +119,6 @@ export const Scanner = () => {
     // Update formData, fileNames, and fileData by removing the item at the given index
     setFormData(formData.filter((_, i) => i !== index));
     setFileNames(fileNames.filter((_, i) => i !== index));
-    setFileData(fileData.filter((_, i) => i !== index));
   };
 
 
