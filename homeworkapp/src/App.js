@@ -73,7 +73,7 @@ export const Scanner = () => {
                 else{
                 canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const resultCanvas = scanner.highlightPaper(canvas);
-                resultCtx.drawImage(resultCanvas, 0, 0);
+                resultCtx.drawImage(resultCanvas, 0, 0); 
                 }
               }, 10);
         };
