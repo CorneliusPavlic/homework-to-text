@@ -6,16 +6,11 @@
   height:0px;
 }
 
-#result{
-  height:480px;
-  width:640px;
-}
-
 .result-canvas-div {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 65vh;
+  height: 80vh;
   width: 100%;
 }
 
