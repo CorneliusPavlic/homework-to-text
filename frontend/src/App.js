@@ -19,7 +19,7 @@ export const Scanner = () => {
 
   const [loadedOpenCV, setLoadedOpenCV] = useState(false);
   const [resetEffect, setResetEffect] = useState(0); //used to run useEffect when needed.
-  const [formData, setFormData] = useState([]); // Use state to manage FormData
+  const [fileData, setFormData] = useState([]); // Use state to manage FormData
   const [fileNames, setFileNames] = useState([]); // Store the names of the files
 
 
@@ -75,8 +75,9 @@ export const Scanner = () => {
       currentFile.current = '';
     }
     else{
-      var imgData = document.getElementById('result').toDataURL("image/jpeg", 1.0);
-      setFormData(prevState => [...prevState, imgData]);
+      document.getElementById('result').toBlob((blob) => {
+        setFormData(prevState => [...prevState, blob]);
+      },"image/jpeg", 1.0);
     }
 
 
@@ -88,8 +89,30 @@ export const Scanner = () => {
 
 
 //Will send the information to the backend for processing.
-  const sendToFlask = () => {
+  const sendToFlask = async (event) => {
+    event.preventDefault(); 
+
+    const formData = new FormData();
+    fileData.forEach(file => {
+      formData.append('file', file); // Assuming 'file' is the expected field name
+    });
     console.log(formData);
+    try {
+      const response = await fetch('/api/upload', { // Replace with your Flask endpoint
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        console.log('File uploaded successfully!');
+        // Handle success, e.g., clear the input, display a message
+      } else {
+        console.error('Upload failed:', response.statusText);
+        // Handle errors, e.g., display an error message
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+    }
   };
 
    
@@ -101,11 +124,11 @@ export const Scanner = () => {
       currentName.current = file.name;
 
       if (file.type === 'application/pdf') {
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = function () {
-          currentFile.current = reader.result;
-        } 
+        // let reader = new FileReader();
+        // reader.readAsDataURL(file);
+        // reader.onloadend = function () {
+          currentFile.current = file;
+        //} 
       }
       else{
         document.getElementById('hiddenImage').src = URL.createObjectURL(file);
@@ -117,7 +140,7 @@ export const Scanner = () => {
   //removes file from all relevant places. 
   const deleteFile = (index) => {
     // Update formData, fileNames, and fileData by removing the item at the given index
-    setFormData(formData.filter((_, i) => i !== index));
+    setFormData(fileData.filter((_, i) => i !== index));
     setFileNames(fileNames.filter((_, i) => i !== index));
   };
 
@@ -157,13 +180,13 @@ export const Scanner = () => {
             <canvas id="result"></canvas>
             <img id='hiddenImage' alt=''/>
           </div>
-          <form action='/api/sendFiles' method="post" enctype='multipart/form-data'>
+          <form onSubmit={sendToFlask}>
             <input type='file' id='myFile' name="filename" onChange={handleFileUpload}/>
             <input type='submit' onClick={sendToFlask}/>
           </form>
           <button onClick={addAnotherFile}>Add this File</button>
           <form/>
-
+          <button onClick={sendToFlask}>Test contents</button>
           {/* Display the names of the files */}
           <ul>
             {fileNames.map((fileName, index) => (
