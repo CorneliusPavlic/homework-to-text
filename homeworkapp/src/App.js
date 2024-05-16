@@ -29,7 +29,6 @@ export const Scanner = () => {
        try{  
          isRunning.current = true;
          const intervalPtr = setInterval(() => {
-              console.log("Hello")
                if (document.getElementById('hiddenImage').src !== testAgainst){
                   let image = document.getElementById("hiddenImage");
                   if(!image.complete) {
