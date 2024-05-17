@@ -96,13 +96,13 @@ export const Scanner = () => {
     fileData.forEach(file => {
       formData.append('file', file); // Assuming 'file' is the expected field name
     });
+    console.log(fileData)
     try {
       const response = await fetch('http://localhost:5000/api/sendFiles', { // Replace with your Flask endpoint
       mode: 'cors',
       method: 'POST',
       body: formData,
     });
-    console.log(response)
       if (response.ok) {
         const data = await response.text(); // Get the response as text
         console.log('File uploaded successfully!');
