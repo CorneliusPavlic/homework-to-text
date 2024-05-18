@@ -1,70 +1,22 @@
-# Getting Started with Create React App
+# Homework-to-Text Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a react front end that consists of almost entirely one component. The scanner component,  the only other thing is in index.html there is a CDN devlivery of the [jscanify library.](https://colonelparrot.github.io/jscanify/). That needs to remain in the final iteration. jscanify uses the OpenCV library so there is also a loading function for that. 
 
-## Available Scripts
+The UseEffect function calls loadCV with an interval, The interval is not strictly necessary it's left over from an attempt at a video stream,
+The goal is to remove this eventually but as of right now it is still in the code. It should be replaced with an event listener for when the image src changes
 
-In the project directory, you can run:
+The extractFileFromCanvas function, uses the jscanify library to first draw the image to the canvas, then calls extractPaper which removes the paper from the background and sizes it correctly, then draws that back to the canvas.
 
-### `npm start`
+The addAnotherFile function triggers when the user clicks the add file button, and adds the file information to the list of files that will be sent to the backend.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+the handleFileUpload function triggers when a file is uploaded and adds the relevant information to the places it needs to go, it doesn't actually do much itself other than set off the interval in the useEffect loop.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+the deleteFile function simply removes files and names from the array that is storing them when the user clicks the delete button.
 
-### `npm test`
+The sendToFlask function triggers when user clicks the Test contents button and sends the contents to the Backend. Once it recieves a response it adds the text contents to the math <p> tag This can easily be changed to accomodate where ever it needs to go.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## As to Front end design
 
-### `npm run build`
+Pretty much anything can be changed for styling and moving components, the important components are the canvas and the form, the image tag is never displayed to no need to style it, It just makes drawing to the canvas easier.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The canvas as of right now sets it's size to the original size of the image, this makes for unpredictable sizing so it may need to be placed within a div to control that or the size of the canvas can be modified just be careful of distortion.

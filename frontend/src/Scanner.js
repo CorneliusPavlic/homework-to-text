@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import './App.css'
+import './Scanner.css'
 
 export const Scanner = () => {
 
