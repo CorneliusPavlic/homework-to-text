@@ -10,11 +10,15 @@ import io  # For handling in-memory files
 import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
+import openai
 
+load_dotenv()
 app = Flask(__name__)
 
+openai.api_key = os.getenv('OPEN_AI_API_KEY')
+genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 # Correct CORS configuration (allow specific origin)
-CORS(app, resources={r"/api/sendFiles": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/sendFiles": {"origins": "http://localhost:3000"}, r"/api/openAI": {"origins": "http://localhost:3000"}, r"/api/Gemini": {"origins": "http://localhost:3000"}})
 
 @app.route('/api/sendFiles', methods=['POST'])
 @cross_origin(origins="http://localhost:3000")
@@ -102,6 +106,39 @@ def preprocess_image(image_path):
     _, thresh = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY_INV)
     return thresh
 
+@app.route('/api/openAI', methods=['POST'])
+@cross_origin(origins="http://localhost:3000")
+def open_ai_call():
+    prompt = request.form.get('string')
+    response = openai.Completion.create(
+    engine="gpt-3.5-turbo",  # You can use other engines like "gpt-3.5-turbo"
+    prompt=prompt,
+    max_tokens=1000,  # Adjust the number of tokens based on your needs
+    n=1,  # Number of responses to generate
+    stop=None,  # You can define stop sequences here if needed
+    temperature=0.7  # Adjust the creativity of the output
+    )
+    return response.choices[0].text.strip()
+
+
+@app.route('/api/Gemini', methods=['POST'])
+@cross_origin(origins="http://localhost:3000")
+def getGeminiResponse(file_path):
+    """Analyzes a math image using Gemini Pro Vision and returns LaTeX expressions."""
+    print("making Gemini Call")
+    model = genai.GenerativeModel('gemini-pro-vision')
+    with Image.open(file_path) as img:  # Open the image using Image.open
+        # Convert image to bytes for Gemini Pro Vision
+        img_bytes = io.BytesIO()
+        img.save(img_bytes, format='PNG')
+        response = model.generate_content(
+            ['If this image contains math problems Analyze it for each math problem and list each one in LaTeX', img],
+            stream=True
+        )
+        print("done with gemini call")
+        response.resolve()
+        print(response.text)  # Print the Gemini response
+        return response.text  # Return the content
 if __name__ == '__main__':
     app.run(debug=True)
 
