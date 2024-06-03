@@ -115,7 +115,7 @@ def gemini_call():
     prompt = data.get('data')
     model = genai.GenerativeModel('models/gemini-pro')
     response = model.generate_content(
-            [f"analze whether the follow math is correct : {prompt}"],
+            [f"You are a world class mathematics teacher with a specialty in recognizing children's errors in math problems, You will analyze a problem similar to this #1 (2 1/3) + (7 1/5) Student Answer: ((7 * 5)/(3 * 5)) + ((1 * 3)/(5 * 3)) = (35/15) + (3/15) = (38/15) = (2 8/15) = (2 8/15) and give an answer that highlights the places where the child made a mistake: {prompt}"],
             stream=True
         )
     response.resolve()
