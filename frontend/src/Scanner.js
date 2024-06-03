@@ -172,7 +172,10 @@ export const Scanner = () => {
         body: JSON.stringify({ data }),
       });
       if (response.ok) {
-        const result = await response.text();
+        const data = await response.text();
+        setData(data); // Save the response data
+        const resultElement = document.getElementById('math');
+        resultElement.textContent = data;
         console.log('Sent to Gemini successfully:', result);
       } else {
         console.error('Failed to send to Gemini:', response.statusText);

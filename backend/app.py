@@ -10,7 +10,7 @@ import io
 import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
-import openai
+from openai import OpenAI
 
 load_dotenv()
 app = Flask(__name__)
@@ -19,7 +19,9 @@ CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 
 
-openai.api_key = os.getenv('OPEN_AI_API_KEY')
+client = OpenAI(
+api_key=os.getenv('OPEN_AI_API_KEY')
+) 
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 @app.route('/api/sendFiles', methods=['POST'])
@@ -91,13 +93,14 @@ def preprocess_image(image_path):
 def open_ai_call():
     data = request.get_json()
     prompt = data.get('data')
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=1000,
-        n=1,
-        stop=None,
-        temperature=0.7
+    response = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": "Say this is a test",
+            }
+        ],
+        model="gpt-3.5-turbo"
     )
     return jsonify({'response': response.choices[0].text.strip()})
 
@@ -107,17 +110,14 @@ def open_ai_call():
 @cross_origin(origins="http://localhost:3000")
 def gemini_call():
     data = request.get_json()
-    file_path = data.get('file_path')
-    model = genai.GenerativeModel('gemini-pro-vision')
-    with Image.open(file_path) as img:
-        img_bytes = io.BytesIO()
-        img.save(img_bytes, format='PNG')
-        response = model.generate_content(
-            ['If this image contains math problems Analyze it for each math problem and list each one in LaTeX', img],
+    prompt = data.get('data')
+    model = genai.GenerativeModel('models/gemini-pro')
+    response = model.generate_content(
+            [f'analyze this as if you were a math teacher: {prompt}'],
             stream=True
         )
-        response.resolve()
-        return jsonify({'response': response.text.strip()})
+    response.resolve()
+    return jsonify({'response': response.text.strip()})
 
 if __name__ == '__main__':
     app.run(debug=True)
