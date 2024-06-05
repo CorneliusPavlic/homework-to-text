@@ -17,7 +17,54 @@ export const Scanner = () => {
   const [fileData, setFormData] = useState([]);
   const [fileNames, setFileNames] = useState([]);
   const [imgSrc, setImgSrc] = useState('');
-  const [data, setData] = useState(''); // New state to store the response data
+  const [data, setData] = useState(''); 
+  const [isDarkMode, setIsDarkMode] = useState(false); 
+  const [editedData, setEditedData] = useState(''); 
+  const [isLoading, setIsLoading] = useState(false); // State for loading animation
+  const fileInputRef = useRef(null); // Reference for the file input
+  
+  const handleFileUpload = (file) => {
+    if (!file) return; // Handle case where file is not provided (e.g., drag-and-drop)
+    currentName.current = file.name;
+    if (file.type === 'application/pdf') {
+        currentFile.current = file;
+        resultCtx.current.font = '20px serif';
+        resultCtx.current.fillText(file.name, 10, 50)
+    }
+    else {
+      setImgSrc(URL.createObjectURL(file));
+    }
+  };
+  // Handle file drop
+  const handleFileDrop = (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    handleFileUpload(file); // Use the same handleFileUpload function
+  };
+
+  // Prevent default behavior when dragging over
+  const handleDragOver = (event) => {
+    event.preventDefault();
+  };
+
+  
+  // Function to trigger file input click
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
+
+
+  const handleTextChange = (event) => {
+    setEditedData(event.target.value);
+  };
+  // Toggle Dark Mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  useEffect(() => {
+    document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
+  }, [isDarkMode]);
 
   useEffect(() => {
     loadOpenCv(() => {
@@ -38,7 +85,7 @@ export const Scanner = () => {
       setTimeout(extractFileFromCanvas, 1000);
     }
   }, [imgSrc]);
-
+  
   const extractFileFromCanvas = () => {
     result.current.width = image.current.naturalWidth;
     result.current.height = image.current.naturalHeight;
@@ -51,9 +98,11 @@ export const Scanner = () => {
     );
     const resultImage = scanner.current.extractPaper(result.current, 500, 1000);
     resultCtx.current.drawImage(resultImage, 0, 0, result.current.width, result.current.height);
+    result.current.style.width = '400px';
+    result.current.style.height = '500px';
     isRunning.current = false;
   };
-
+  
   const addAnotherFile = () => {
     if (currentFile.current !== '') {
       setFormData((prevState) => [...prevState, currentFile.current]);
@@ -67,15 +116,27 @@ export const Scanner = () => {
         ]);
       }, 'image/jpeg', 1.0);
     }
-
+    
     const filename = currentName.current;
     setFileNames((prevState) => [...prevState, filename]);
     resultCtx.current.clearRect(0, 0, result.current.width, result.current.height);
   };
-
+  
+  
+  const deleteFile = (index) => {
+    setFormData(fileData.filter((_, i) => i !== index));
+    setFileNames(fileNames.filter((_, i) => i !== index));
+  };
+  
+  // const handleFileUpload = (event) => {
+  //   const file = event.target.files[0];
+  //   currentName.current = file.name;
+  //   setImgSrc(URL.createObjectURL(file));
+  // };
   const sendToFlask = async (event) => {
+    console.log("hello")
     event.preventDefault();
-
+    setIsLoading(true); // Start loading animation
     const formData = new FormData();
     fileData.forEach((file) => {
       formData.append('file', file);
@@ -88,12 +149,15 @@ export const Scanner = () => {
         body: formData,
       });
       if (response.ok) {
+        setIsLoading(false); // Start loading animation
         const data = await response.text();
-        console.log('File uploaded successfully!');
-        setData(data); // Save the response data
+        console.log(data);
+        setData(data);
+        setEditedData(data);
         const resultElement = document.getElementById('math');
         resultElement.textContent = data;
       } else {
+        setIsLoading(false); // Start loading animation
         console.error('Upload failed:', response.statusText);
       }
     } catch (error) {
@@ -101,21 +165,56 @@ export const Scanner = () => {
     }
   };
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    currentName.current = file.name;
-
-    if (file.type === 'application/pdf') {
-      currentFile.current = file;
-    } else {
-      setImgSrc(URL.createObjectURL(file));
-      console.log(image.current.src);
+  const sendToOpenAI = async () => {
+    try {
+      setIsLoading(true); // Start loading animation
+      const response = await fetch('http://localhost:5000/api/openAI', {
+        mode: 'cors',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data }),
+      });
+      if (response.ok) {
+        setIsLoading(false); // Start loading animation
+        const result = await response.text();
+        console.log('Sent to OpenAI successfully:', result);
+      } else {
+        setIsLoading(false); // Start loading animation
+        console.error('Failed to send to OpenAI:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error sending to OpenAI:', error);
     }
   };
 
-  const deleteFile = (index) => {
-    setFormData(fileData.filter((_, i) => i !== index));
-    setFileNames(fileNames.filter((_, i) => i !== index));
+  const sendToGemini = async () => {
+    try {
+      setIsLoading(true); // Start loading animation
+      const response = await fetch('http://localhost:5000/api/Gemini', {
+        mode: 'cors',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data }),
+      });
+      if (response.ok) {
+        setIsLoading(false); // Start loading animation
+        const data = await response.text();
+        setData(data); 
+        setEditedData(data);
+        const resultElement = document.getElementById('math');
+        resultElement.textContent = data;
+        console.log('Sent to Gemini successfully:', result);
+      } else {
+        setIsLoading(false); // Start loading animation
+        console.error('Failed to send to Gemini:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error sending to Gemini:', error);
+    }
   };
 
   const loadOpenCv = (onComplete) => {
@@ -138,55 +237,15 @@ export const Scanner = () => {
     }
   };
 
-  // New function to send data to the openAI endpoint
-  const sendToOpenAI = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/openAI', {
-        mode: 'cors',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data }),
-      });
-      if (response.ok) {
-        const result = await response.text();
-        console.log('Sent to OpenAI successfully:', result);
-      } else {
-        console.error('Failed to send to OpenAI:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error sending to OpenAI:', error);
-    }
-  };
-
-  // New function to send data to the Gemini endpoint
-  const sendToGemini = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/Gemini', {
-        mode: 'cors',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data }),
-      });
-      if (response.ok) {
-        const data = await response.text();
-        setData(data); // Save the response data
-        const resultElement = document.getElementById('math');
-        resultElement.textContent = data;
-        console.log('Sent to Gemini successfully:', result);
-      } else {
-        console.error('Failed to send to Gemini:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error sending to Gemini:', error);
-    }
-  };
-
   return (
     <>
+      <input
+        type="checkbox"
+        className="dark-mode-toggle"
+        id="dark-mode-toggle"
+        checked={isDarkMode}
+        onChange={toggleDarkMode}
+      />
       <div className="scanner-container">
         <div>
           {!loadedOpenCV && (
@@ -194,34 +253,65 @@ export const Scanner = () => {
               <h2>Loading OpenCV...</h2>
             </div>
           )}
+
+          {isLoading && ( // Show the loading animation if isLoading is true
+            <div className="loading-container"> {/* New container for overlay */}
+              <div className="lds-ring"><div></div><div></div><div></div><div></div></div>
+            </div>
+          )}
+
           <div className="result-canvas-div">
             <canvas id="result"></canvas>
             <img id="hiddenImage" alt="" src={imgSrc} />
           </div>
+
+          <div className="file-upload-area" onDrop={handleFileDrop} onDragOver={handleDragOver} onClick={triggerFileInput}>
+            <input type="file" id="myFile" name="filename" ref={fileInputRef} onChange={(event) => handleFileUpload(event.target.files[0])}  hidden /> 
+            <span className="file-upload-icon">+</span> 
+            <span className="file-upload-text">Drag and drop a file here, or click to upload</span>
+          </div>
+
           <form onSubmit={sendToFlask}>
-            <input type="file" id="myFile" name="filename" onChange={handleFileUpload} />
+            <div className="button-container">
+              <button onClick={addAnotherFile} className="primary-color send-button">
+                Add File
+              </button>
+              <button type="submit" className="primary-color send-button">
+                Send to Flask
+              </button> 
+            </div>
           </form>
-          <button onClick={addAnotherFile}>Add this File</button>
-          <form />
-          <button onClick={sendToFlask}>Test contents</button>
-          {/* Display the names of the files */}
+
           <ul>
             {fileNames.map((fileName, index) => (
               <li key={index}>
                 {fileName}
-                <button onClick={() => deleteFile(index)}>Delete</button>
+                <button onClick={() => deleteFile(index)} className="secondary-color">Delete</button> 
               </li>
             ))}
           </ul>
-          {/* New buttons to send data to openAI and Gemini endpoints */}
-          <button onClick={sendToOpenAI} disabled={!data}>
-            Send to OpenAI
-          </button>
-          <button onClick={sendToGemini} disabled={!data}>
-            Send to Gemini
-          </button>
+
+          {data && ( // Show the buttons only if data is available
+            <>
+              <button onClick={sendToOpenAI} className="secondary-color">
+                Send to OpenAI
+              </button>
+              <button onClick={sendToGemini} className="secondary-color">
+                Send to Gemini
+              </button>
+            </>
+          )}
+
         </div>
-        <p id="math"></p>
+
+        <textarea
+          id="math"
+          className="text-box"
+          value={editedData}
+          onChange={handleTextChange}
+          rows={10}
+        ></textarea>
+
         <div ref={containerRef} id="result-container"></div>
       </div>
     </>

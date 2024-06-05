@@ -1,20 +1,305 @@
-#canvas {
-  height:0px;
+/* GENERAL STYLING */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background-color: #f5f5f5; /* Light Mode Background */
+  color: #333;                 /* Light Mode Text Color */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-#video {
-  height:0px;
+/* DARK MODE */
+body.dark-mode {
+  background-color: #121212; /* Dark Mode Background */
+  color: #e0e0e0;              /* Dark Mode Text Color */
 }
 
-.result-canvas-div {
+/* Primary and Secondary Colors */
+.primary-color {
+  background-color: #007bff; /* Primary Blue */
+  color: #fff;
+}
+
+.secondary-color {
+  background-color: #ffc107; /* Secondary Yellow */
+  color: #fff;
+}
+
+/* Accent Colors */
+.accent-color {
+  color: #007bff; /* Primary Blue */
+}
+
+.accent-color-dark {
+  color: #ffc107; /* Secondary Yellow */
+}
+
+.scanner-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 80vh;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+/* RESULT CANVAS STYLING */
+.result-canvas-div {
+  position: relative;
   width: 100%;
+  max-width: 800px;
+  max-height: 800px;
+  margin-bottom: 2rem;
+}
+
+#result {
+  width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #hiddenImage {
-  object-fit:contain;
-  height:0px;
+  display: none;
+}
+
+/* FORM AND BUTTON STYLING */
+form {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+input[type='file'] {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+button {
+  background-color: #007bff; /* Primary Blue */
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker Blue */
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* FILE LIST STYLING */
+ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+/* MATH RESULT */
+#math {
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 1rem;
+}
+
+/* Dark Mode Colors */
+.dark-mode .primary-color {
+  background-color: #ffc107; /* Secondary Yellow */
+  color: #121212;
+}
+
+.dark-mode .secondary-color {
+  background-color: #007bff; /* Primary Blue */
+  color: #121212;
+}
+
+.dark-mode .accent-color {
+  color: #ffc107; /* Secondary Yellow */
+}
+
+.dark-mode .accent-color-dark {
+  color: #007bff; /* Primary Blue */
+}
+
+.dark-mode #math {
+  background-color: #282c34; /* Darker Gray */
+  border-color: #555;
+}
+
+.dark-mode-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  display: inline-block;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #ccc;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode-toggle:checked {
+  background-color: #2196F3; /* Example 'on' color */
+}
+
+.dark-mode-toggle::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  transition: transform 0.3s ease;
+}
+
+.dark-mode-toggle:checked::before {
+  transform: translateX(30px);
+}
+
+/* Loading Animation */
+.loading-bar {
+  width: 0%;
+  height: 8px;
+  background-color: #007bff; /* Bar color */
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  animation: loading-animation 2s linear infinite; /* Set animation */
+}
+
+@keyframes loading-animation {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Add a CSS class to the button */
+.send-button {
+  background-color: #ffc107; /* Accent color for the button */
+}
+
+/* Add a CSS class to the text box */
+.text-box {
+  width: 100%;
+  max-width: 800px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  margin-top: 2rem;
+  font-size: 1.2rem;
+}
+
+.loading-container {
+  position: fixed; /* Position relative to the viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  z-index: 1000; /* Ensure it's on top */
+}
+
+
+.lds-ring,
+.lds-ring div {
+  box-sizing: border-box;
+}
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 8px solid currentColor;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: currentColor transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.button-container {
+  display: flex;
+  gap: 1rem; /* Space between buttons */
+  margin-bottom: 1rem;
+}
+
+.file-upload-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px; /* Adjust width as needed */
+  height: 100px; /* Adjust height as needed */
+  border: 2px dashed #ccc; /* Dashed border for drag-and-drop effect */
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  color: #666; /* Text color */
+  font-size: 14px; /* Text size */
+  transition: border-color 0.3s ease;
+}
+
+.file-upload-area:hover {
+  border-color: #007bff; /* Highlight border on hover */
+}
+
+.file-upload-icon {
+  font-size: 30px;
+  margin-right: 10px;
+  color: #666;
+}
+
+.file-upload-text {
+  margin-left: 10px;
+  color: #666;
+}
+
+/* Hide the default file input */
+input[type='file'] {
+  display: none; 
 }

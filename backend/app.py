@@ -27,6 +27,7 @@ genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 @app.route('/api/sendFiles', methods=['POST'])
 @cross_origin(origins="http://localhost:3000")
 def upload_file():
+    return "Hello World"
     # model = load_model('./mnist_digit_recognition_model.h5')
     result_string = ''
 
