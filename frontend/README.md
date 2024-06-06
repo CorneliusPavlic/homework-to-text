@@ -1,11 +1,10 @@
 # Homework-to-Text Frontend
 
-This is a react front end that consists of almost entirely one component. The scanner component,  the only other thing is in index.html there is a CDN devlivery of the [jscanify library.](https://colonelparrot.github.io/jscanify/). That needs to remain in the final iteration. jscanify uses the OpenCV library so there is also a loading function for that. 
+This is a react front end that consists of almost entirely one component. The scanner component,  the only other thing is in index.html there is a CDN devlivery of the [jscanify library.](https://colonelparrot.github.io/jscanify/). That needs to remain in the final iteration. jscanify uses the OpenCV library so there is also a loading function for that.
 
-The UseEffect function calls loadCV with an interval, The interval is not strictly necessary it's left over from an attempt at a video stream,
-The goal is to remove this eventually but as of right now it is still in the code. It should be replaced with an event listener for when the image src changes
+The UseEffect function calls loadCV with the setup for the canvas.
 
-The extractFileFromCanvas function, uses the jscanify library to first draw the image to the canvas, then calls extractPaper which removes the paper from the background and sizes it correctly, then draws that back to the canvas.
+The extractFileFromCanvas function, uses the jscanify library to first draw the image to the canvas, then calls extractPaper which removes the paper from the background and sizes it correctly, then draws that back to the canvas. It's called when the imgSrc variable is updated.
 
 The addAnotherFile function triggers when the user clicks the add file button, and adds the file information to the list of files that will be sent to the backend.
 
