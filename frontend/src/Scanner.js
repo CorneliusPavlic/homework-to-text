@@ -20,9 +20,15 @@ export const Scanner = () => {
   const [data, setData] = useState(''); 
   const [isDarkMode, setIsDarkMode] = useState(false); 
   const [editedData, setEditedData] = useState(''); 
-  const [isLoading, setIsLoading] = useState(false); // State for loading animation
+  const [isLoading, setIsLoading] = useState(false); // State for loading animation\
+  const [useCentering, setUseCentering] = useState(false);
   const fileInputRef = useRef(null); // Reference for the file input
   
+
+  useEffect(() => {
+    console.log(fileData);  // This will log whenever fileData changes
+}, [fileData]); 
+
   const handleFileUpload = (file) => {
     if (!file) return; // Handle case where file is not provided (e.g., drag-and-drop)
     currentName.current = file.name;
@@ -30,6 +36,10 @@ export const Scanner = () => {
         currentFile.current = file;
         resultCtx.current.font = '20px serif';
         resultCtx.current.fillText(file.name, 10, 50)
+    }
+    else if (useCentering === false){
+      currentFile.current = file;
+      setImgSrc(URL.createObjectURL(file));
     }
     else {
       setImgSrc(URL.createObjectURL(file));
@@ -61,6 +71,10 @@ export const Scanner = () => {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  const toggleCentering = () => {
+    setUseCentering(!useCentering);
+  }
 
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
@@ -106,7 +120,7 @@ export const Scanner = () => {
   const addAnotherFile = () => {
     if (currentFile.current !== '') {
       setFormData((prevState) => [...prevState, currentFile.current]);
-      currentFile.current = '';
+      setTimeout(() => {currentFile.current = '';}, 500);
     } else {
       document.getElementById('result').toBlob((blob) => {
         setFormData((prevState) => [
@@ -134,7 +148,6 @@ export const Scanner = () => {
   //   setImgSrc(URL.createObjectURL(file));
   // };
   const sendToFlask = async (event) => {
-    console.log("hello")
     event.preventDefault();
     setIsLoading(true); // Start loading animation
     const formData = new FormData();
@@ -168,7 +181,7 @@ export const Scanner = () => {
   const sendToOpenAI = async () => {
     try {
       setIsLoading(true); // Start loading animation
-      const response = await fetch('http://localhost:5000/api/openAI', {
+      const response = await fetch('http://localhost:5000', {
         mode: 'cors',
         method: 'POST',
         headers: {
@@ -192,7 +205,7 @@ export const Scanner = () => {
   const sendToGemini = async () => {
     try {
       setIsLoading(true); // Start loading animation
-      const response = await fetch('http://localhost:5000/api/Gemini', {
+      const response = await fetch('http://localhost:5000', {
         mode: 'cors',
         method: 'POST',
         headers: {
@@ -246,6 +259,7 @@ export const Scanner = () => {
         checked={isDarkMode}
         onChange={toggleDarkMode}
       />
+       
       <div className="scanner-container">
         <div>
           {!loadedOpenCV && (
@@ -272,15 +286,22 @@ export const Scanner = () => {
           </div>
 
           <form onSubmit={sendToFlask}>
+          </form>
             <div className="button-container">
               <button onClick={addAnotherFile} className="primary-color send-button">
                 Add File
               </button>
-              <button type="submit" className="primary-color send-button">
+              <button onClick={sendToFlask} className="primary-color send-button">
                 Send to Flask
               </button> 
+              <input
+              type="checkbox"
+              checked={useCentering}
+              id='centeringToggle'
+              onChange={toggleCentering}
+              />
+              <label for="centeringToggle">Only select if the image is not scanned</label>
             </div>
-          </form>
 
           <ul>
             {fileNames.map((fileName, index) => (
