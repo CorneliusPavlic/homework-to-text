@@ -214,7 +214,7 @@ def segment_fractions(path):
 
     # filter out excessively large boxes
     filtered = []
-    max_area = 30000
+    max_area = 4000
     for box in boxes:
         w = box[1][0] - box[0][0]
         h = box[1][1] - box[0][1]
@@ -289,7 +289,7 @@ def segment_fractions(path):
     roi = []
     copy = np.copy(orig);
     for box in boxes:
-        if (box[1][1] - box[0][1]) * (box[1][0] - box[0][0]) < 200: continue
+        if (box[1][1] - box[0][1]) * (box[1][0] - box[0][0]) < 400: continue
         roi.append([copy[box[0][1]:box[1][1],box[0][0]:box[1][0]], [[box[0][1], box[0][0]], [box[1][1], box[1][0]]]])
     return roi 
 
