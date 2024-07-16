@@ -289,9 +289,24 @@ def segment_fractions(path):
     roi = []
     copy = np.copy(orig);
     for box in boxes:
-        if (box[1][1] - box[0][1]) * (box[1][0] - box[0][0]) < 400: continue
+        area = (box[1][1] - box[0][1]) * (box[1][0] - box[0][0])
+        if area < 100 or (area < 400 and calculate_aspect_ratio(box) < 0.8): continue
         roi.append([copy[box[0][1]:box[1][1],box[0][0]:box[1][0]], [[box[0][1], box[0][0]], [box[1][1], box[1][0]]]])
     return roi 
+
+def calculate_aspect_ratio(box):
+    # Calculate width and height of the box
+    width = abs(box[1][0] - box[0][0])
+    height = abs(box[1][1] - box[0][1])
+    
+    # Avoid division by zero
+    if height == 0:
+        return "Height is zero, aspect ratio undefined"
+    
+    # Calculate aspect ratio
+    aspect_ratio = width / height
+    
+    return aspect_ratio
 
 def bound_equations(bounded_problems, roi):
     bounded_problems = sorted(bounded_problems, key=lambda x: (x[0][0], x[0][1]))
