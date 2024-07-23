@@ -495,7 +495,7 @@ def resize_and_maintain_aspect_ratio(image, target_width=None, target_height=Non
     return resized_image
 
 
-def is_minus_sign(image):
+def  is_minus_sign(image):
     # Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
@@ -567,7 +567,7 @@ def process_string(input_string):
 
 def get_results(final_results):
     # Initialize PaddleOCR
-    ocr = PaddleOCR(rec_model_dir="./model",use_angle_cls=False, lang='en', drop_score=0.1)  # Specify the language ('en' for English)
+    ocr = PaddleOCR(rec_model_dir="/User/corne/anaconda3/envs/paddleocr/Lib/site-packages/PaddleOCR/pretrain_models/model_inference/Student/inference",use_angle_cls=False, lang='en', drop_score=0.1)  # Specify the language ('en' for English)
     # Initialize result string
     result_string = ""
     result_bottom = None
@@ -582,6 +582,7 @@ def get_results(final_results):
         if copy_top is not None:
             result_top = ocr.ocr(copy_top, cls=True, det=False, rec=True)
         if copy_bottom is not None:
+            print(copy_bottom)
             result_bottom = ocr.ocr(copy_bottom, cls=True, det=False, rec=True)
 
         # Extract text from OCR results

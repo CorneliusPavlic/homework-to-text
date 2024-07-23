@@ -22,7 +22,7 @@ genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 def upload_file():
     result_string = ""
     files = request.files.getlist('file')
-
+    print(files)
     if not os.path.exists('images'):
         os.makedirs('images')
 
@@ -37,6 +37,7 @@ def upload_file():
         result_string += f"Page {str(i+1)}: \n\n"
         result_string += make_prediction(f"./images/{file}") 
         result_string += "\n\n"
+        print(result_string)
     
 
     for file in os.listdir('images'):
@@ -49,21 +50,6 @@ def save_pdf_pages_as_png(pdf_path, output_dir="images"):
     pages = convert_from_path(pdf_path)
     for page_number, page in enumerate(pages):
         page.save(f"{output_dir}/page-{page_number}.png")
-
-
-
-@app.route('/api/Gemini', methods=['POST'])
-@cross_origin(origins="http://localhost:3000")
-def gemini_call():
-    data = request.get_json()
-    prompt = data.get('data')
-    model = genai.GenerativeModel('models/gemini-pro')
-    response = model.generate_content(
-            [f"You are a world class mathematics teacher with a specialty in recognizing children's errors in math problems, You will analyze a problem similar to this #1 (2 1/3) + (7 1/5) Student Answer: ((7 * 5)/(3 * 5)) + ((1 * 3)/(5 * 3)) = (35/15) + (3/15) = (38/15) = (2 8/15) = (2 8/15) and give aa seperate answer for each problem that highlights the places where the child made a mistake: {prompt}"],
-            stream=True
-        )
-    response.resolve()
-    return jsonify({'response': response.text.strip()})
 
 if __name__ == '__main__':
     app.run(debug=True)
