@@ -8,13 +8,15 @@ from paddleocr import PaddleOCR
 def box_area(box):
     return (box[1][0] - box[0][0]) * (box[1][1] - box[0][1])
 
-def combine_two_closest_boxes(mergable_boxes):
+
+
+def combine_two_closest_boxes(mergable_boxes, distance_for_merge=400):
     for i, box in enumerate(mergable_boxes):
         shortest_distance = (10000000, None)
         for j, destination in enumerate(mergable_boxes):
             if j != i:  # Avoid comparing the box with itself
                 distance = distance_between_boxes(box, destination)
-                if 0 < distance < 400 and distance < shortest_distance[0]:
+                if 0 < distance < distance_for_merge and distance < shortest_distance[0]:
                     shortest_distance = (distance, j)
         if shortest_distance[1] is not None:
             return merge_boxes(box, mergable_boxes[shortest_distance[1]]), i, shortest_distance[1]
@@ -66,8 +68,31 @@ def tup(point):
     return (point[0], point[1])
 
 
-def segment_problems(path):
-    img = cv2.imread(path)
+
+""" One of the major functions, This function takes in the path of the image as input and returns bounding boxes for the problems in the image. It does this by using the following steps:
+1. Read the image and convert it to grayscale.
+2. Detect Contours
+3. Systematically merge bounding boxes around those Contours. 
+4. Merge boxes that are close and didn't get a chance to merge. 
+5. remove boxes that are too small.
+
+Changeable Parameters: 
+    path: just path to image. Or can be passed a numpy array of the image.
+
+    merge_margin_vertical: During the merging phase this is how far the box will be expanded vertically. making this smaller will create more boxes. Making it bigger will reduce the amount of boxes. 
+
+    merge_margin_horizontal: During the merging phase this is how far the box will be expanded horizontally. making this smaller will create more boxes. Making it bigger will reduce the amount of boxes.
+
+    distance_for_final_merge: This is the distance between two boxes that will be merged in the final merge phase make it bigger if you want things on opposite sides of the page to merge.
+
+    minimum_box_size: This is the minimum size of a box that will be returned. Make it smaller if you're not seeing the boxes you would expect.
+    debug: will write the image to "SegmentProblemsDebug.png", And draw bounding boxes around the problems. Will slow down the function slightly so make sure to turn it off for production
+ """
+def segment_problems(path, merge_margin_vertical=70,  merge_margin_horizontal=60, distance_for_final_merge=400, minimum_box_size=200, debug=False):
+    if isinstance(path,np.ndarray):
+        img = path
+    else:
+        img = cv2.imread(path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ret, thresh_binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     img = cv2.cvtColor(thresh_binary, cv2.COLOR_GRAY2BGR)
@@ -96,9 +121,6 @@ def segment_problems(path):
         if w*h < max_area:
             filtered.append(box)
     boxes = filtered
-
-    merge_margin_vertical = 70
-    merge_margin_horizontal = 60
     # this is gonna take a long time
     finished = False
     highlight = [[0,0], [1,1]]
@@ -170,7 +192,7 @@ def segment_problems(path):
             big_boxes.append(box)
     flag = True
     while flag == True:
-        new_box, i, j = combine_two_closest_boxes(mergable_boxes)
+        new_box, i, j = combine_two_closest_boxes(mergable_boxes, distance_for_final_merge)
         if(new_box == None): flag = False
         else: 
             mergable_boxes.pop(i)
@@ -183,13 +205,39 @@ def segment_problems(path):
 
     bounded_problems = []
     for box in boxes:
-        if (box[1][1] - box[0][1]) * (box[1][0] - box[0][0]) < 200: continue
+        if (box[1][1] - box[0][1]) * (box[1][0] - box[0][0]) < minimum_box_size: continue
         bounded_problems.append(([box[0][1], box[0][0]], [box[1][1], box[1][0]]))
+        if debug == True:
+            cv2.rectangle(copy, tup(box[0]), tup(box[1]), (0,200,0), 3);
+    
+    if debug == True:
+        cv2.imwrite("SegmentProblemsDebug.png", copy)
     return bounded_problems
 
+""" One of the major functions, This function takes in the path of the image as input and returns bounding boxes for the problems in the image. It does this by using the following steps:
+1. Read the image and convert it to grayscale.
+2. Detect Contours
+3. Systematically merge bounding boxes around those Contours. 
+4. remove boxes that are too small.
 
-def segment_fractions(path):
-    img = cv2.imread(path)
+Changeable Parameters: 
+    path: just path to image. Or can be passed a numpy array of the image.
+
+    merge_margin_vertical: During the merging phase this is how far the box will be expanded vertically. making this smaller will create more boxes. Making it bigger will reduce the amount of boxes. 
+
+    merge_margin_horizontal: During the merging phase this is how far the box will be expanded horizontally. making this smaller will create more boxes. Making it bigger will reduce the amount of boxes.
+    
+    area_for_final_purge: Removes boxes that have areas that suggest they are not a fraction or symbol if they also do not pass the aspect_ratio for final purge test. be careful adjusting this it can cause you to remove symbols.
+
+    aspect_ratio_for_final_purge: Removes boxes that have aspect ratios that along with their area suggest they are not a fraction or symbol. be careful adjusting this it can cause you to remove symbols.
+    
+    debug: will write the image to "SegmentFractionsDebug.png", And draw bounding boxes around the problems. Will slow down the function slightly so make sure to turn it off for production
+ """
+def segment_fractions(path, merge_margin_vertical=30, merge_margin_horizontal=1, area_for_final_purge=400, aspect_ratio_for_final_purge=0.8, debug=False):
+    if isinstance(path,np.ndarray):
+        img = path
+    else:
+        img = cv2.imread(path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ret, thresh_binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     img = cv2.cvtColor(thresh_binary, cv2.COLOR_GRAY2BGR)
@@ -222,9 +270,6 @@ def segment_fractions(path):
             filtered.append(box)
     boxes = filtered
 
-    # go through the boxes and start merging
-    merge_margin_vertical = 30
-    merge_margin_horizontal = 1
     # this is gonna take a long time
     finished = False
     highlight = [[0,0], [1,1]]
@@ -290,8 +335,13 @@ def segment_fractions(path):
     copy = np.copy(orig);
     for box in boxes:
         area = (box[1][1] - box[0][1]) * (box[1][0] - box[0][0])
-        if area < 100 or (area < 400 and calculate_aspect_ratio(box) < 0.8): continue
+        if area < 100 or (area < area_for_final_purge and calculate_aspect_ratio(box) < aspect_ratio_for_final_purge): continue
+        if debug == True:
+            cv2.rectangle(copy, tup(box[0]), tup(box[1]), (0,200,0), 5);
         roi.append([copy[box[0][1]:box[1][1],box[0][0]:box[1][0]], [[box[0][1], box[0][0]], [box[1][1], box[1][0]]]])
+
+    if debug == True:
+        cv2.imwrite("SegmentFractionsDebug.png", copy)
     return roi 
 
 def calculate_aspect_ratio(box):
@@ -308,7 +358,10 @@ def calculate_aspect_ratio(box):
     
     return aspect_ratio
 
+
+""" One of the major functions, This functions takes the bounding equations and roi from fractions and sorts them by logical order. You can change the sorting logic if you want to. Annotated by comments"""
 def bound_equations(bounded_problems, roi):
+    #sorts bounded problems by top left Y then top left X
     bounded_problems = sorted(bounded_problems, key=lambda x: (x[0][0], x[0][1]))
     bounded_equations = []
     for bounded_problem in bounded_problems:
@@ -323,6 +376,7 @@ def bound_equations(bounded_problems, roi):
         bounded_equations.append(eligible_equations)
 
     for box_index, box in enumerate(bounded_equations):
+        #sorts the equations by the midpoint of the x and y coordinates multiplies the x and y with a bias towards the Y. 
         bounded_equations[box_index] = sorted(box, key=lambda item: (
                                                                      ((item[1][1][1] - ((item[1][1][1] - item[1][0][1])/2))*0.8) +
                                                                      (item[1][1][0] - ((item[1][1][0] - item[1][0][0])/2))
@@ -353,6 +407,8 @@ def resize_with_aspect_ratio(image, target_size=(56, 56), color=(255, 255, 255))
 
     return new_image
 
+
+"""One of the major functions just crops and resizes them all."""
 def crop_and_resize(bounded_equations):
     cropped_and_resized = []
     for box in bounded_equations:
@@ -428,6 +484,7 @@ def is_any_center_within_x_bounds(bounding_rectangles, target_rectangle):
 
     return np.any(within_bounds)
 
+"""splits them by their fraction bars. It does this by getting the countours of the cropped image and splitting on the widest bounding box if there are more than 2 contours. otherwise checks if it's an = signs or just adds the whole image. """
 def split_fractions(cropped_and_resized):
     final_results = []
     for img in cropped_and_resized:
@@ -563,11 +620,11 @@ def process_string(input_string):
     
     return result
 
+"""Change rec_model_dir to wherever your PaddleOCR model is stored. Otherwise this just runs the recognizer on all of the iamges and returns a string with substitutions. If you find a consistent issue with replacement add it to process string."""
 
-
-def get_results(final_results):
+def get_results(final_results , rec_model_dir="/User/corne/anaconda3/envs/paddleocr/Lib/site-packages/PaddleOCR/pretrain_models/model_inference/Student/inference"):
     # Initialize PaddleOCR
-    ocr = PaddleOCR(rec_model_dir="/User/corne/anaconda3/envs/paddleocr/Lib/site-packages/PaddleOCR/pretrain_models/model_inference/Student/inference",use_angle_cls=False, lang='en', drop_score=0.1)  # Specify the language ('en' for English)
+    ocr = PaddleOCR(rec_model_dir=rec_model_dir,use_angle_cls=False, lang='en', drop_score=0.1)  # Specify the language ('en' for English)
     # Initialize result string
     result_string = ""
     result_bottom = None
