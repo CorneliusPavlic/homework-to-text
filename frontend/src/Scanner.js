@@ -22,13 +22,9 @@ export const Scanner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [useCentering, setUseCentering] = useState(false);
   const [progress, setProgress] = useState(0); // State for progress bar
-  const [selectedImage, setSelectedImage] = useState(''); // State for selected image from dropdown
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    console.log(fileData);
-  }, [fileData]);
-
+  //Upond file upload If it is a PDF it writes the name of the file to the canvas, otherwise it displays the image on the canvas
   const handleFileUpload = (file) => {
     if (!file) return;
     currentName.current = file.name;
@@ -44,6 +40,7 @@ export const Scanner = () => {
     }
   };
 
+//Calls handlefile upload with the file that was dropped
   const handleFileDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
@@ -76,6 +73,7 @@ export const Scanner = () => {
 
   useEffect(() => {
     loadOpenCv(() => {
+      // sets up canvases with text on the Canvas, This will be replaced when the user uploads an Image. This is free to be changed.
       result.current = document.getElementById('result');
       resultCtx.current = setupCanvas(result.current);
       image.current = document.getElementById('hiddenImage');
@@ -86,14 +84,16 @@ export const Scanner = () => {
       resultCtx.current.fillText("There is also a built in scanner for images taken on phones or images not scanned,", 120, 125);
       resultCtx.current.fillText("If you are using one of those select the checkbox before adding the file.", 140, 150);
       resultCtx.current.fillText("", 140, 175);
+      //eslint has to be disabled if there is no line below you'll get wrong errors. Because jscanify is loaded after launch.
       /* eslint-disable */
       scanner.current = new jscanify();
     });
   }, []);
 
+
+//Sets the pixel density of the canvas. These values can be tweaked a little but be careful because they can become too sharp.
   const setupCanvas = (canvas) => {
-    const dpr = window.devicePixelRatio +1 || 3;
-    console.log(dpr)
+    const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
@@ -102,8 +102,9 @@ export const Scanner = () => {
     return ctx;
   };
 
-
+//extracts image from the canvas after the image has been loaded
   useEffect(() => {
+    //timeout is needed in case the image takes a while to load
     if (imgSrc === '') return;
     if (document.getElementById('hiddenImage').complete) {
       extractFileFromCanvas();
@@ -112,8 +113,8 @@ export const Scanner = () => {
     }
   }, [imgSrc]);
 
+  //uses openCV to  extract the document from the image
   const extractFileFromCanvas = () => {
-    console.log(imgSrc)
     result.current.width = image.current.naturalWidth;
     result.current.height = image.current.naturalHeight;
     resultCtx.current.drawImage(
@@ -129,6 +130,7 @@ export const Scanner = () => {
     result.current.style.height = '500px';
     isRunning.current = false;
   };
+
 
   const addAnotherFile = () => {
     if (currentFile.current !== '') {
@@ -164,8 +166,8 @@ export const Scanner = () => {
     fileData.forEach((file) => {
       formData.append('file', file);
     });
-    console.log(fileData);
 
+    //These values are just filler values. The server isn't going to repsond with updates so just set it to the average time it takes to process a file.
     const totalTime = 25 * fileData.length; // Total time for progress bar (25s per file)
     const updateInterval = 100; // Update interval in ms
     const totalIntervals = totalTime * 1000 / updateInterval; // Total number of intervals
@@ -243,7 +245,6 @@ export const Scanner = () => {
 
   const handleDropdownChange = async (event) => {
     const selectedValue = event.target.value;
-    setSelectedImage(selectedValue);
     if (selectedValue) {
       const imagePath = `/image${selectedValue}.jpg`; // Assuming images are named image1.jpg, image2.jpg, etc.
       const fileName = `image(${selectedValue}).jpg`;
