@@ -4,6 +4,7 @@ import os
 from PIL import Image
 from pdf2image import convert_from_path
 from functions import make_prediction
+import shutil
 
 app = Flask(__name__)
 
@@ -14,25 +15,26 @@ def upload_file():
     result_string = ""
     files = request.files.getlist('file')
     print(files)
-    if not os.path.exists('images'):
-        os.makedirs('images')
+
+    # Create a unique folder name
+    unique_folder = os.path.join('images', str(uuid.uuid4()))
+    os.makedirs(unique_folder, exist_ok=True)
 
     for file in files:
         filename = secure_filename(file.filename)
-        file_path = os.path.join('images', filename)
+        file_path = os.path.join(unique_folder, filename)
         file.save(file_path)
         if file_path.endswith(".pdf"):
-            save_pdf_pages_as_png(file_path)
+            save_pdf_pages_as_png(file_path, output_folder=unique_folder)
 
-    for i, file in enumerate(os.listdir('images')):
+    for i, file in enumerate(os.listdir(unique_folder)):
         result_string += f"Page {str(i+1)}: \n\n"
-        result_string += make_prediction(f"./images/{file}") 
+        result_string += make_prediction(os.path.join(unique_folder, file))
         result_string += "\n\n"
         print(result_string)
-    
 
-    for file in os.listdir('images'):
-        os.remove(os.path.join('images', file))
+    # Clean up the unique folder after processing
+    shutil.rmtree(unique_folder)
 
     return result_string
 
