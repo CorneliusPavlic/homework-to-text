@@ -180,7 +180,7 @@ export const Scanner = () => {
     }, updateInterval);
 
     try {
-      const response = await fetch('perdita.guans.cs.kent.edu/api/sendFiles', {
+      const response = await fetch('/api/sendFiles', {
         mode: 'cors',
         method: 'POST',
         body: formData,

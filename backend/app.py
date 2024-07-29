@@ -1,24 +1,15 @@
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-from flask_cors import CORS, cross_origin
 import os
-from dotenv import load_dotenv
-import google.generativeai as genai
 from PIL import Image
 from pdf2image import convert_from_path
 from functions import make_prediction
 
-load_dotenv()
 app = Flask(__name__)
 
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-
-
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 @app.route('/api/sendFiles', methods=['POST'])
-@cross_origin(origins="http://localhost:3000")
 def upload_file():
     result_string = ""
     files = request.files.getlist('file')
@@ -52,4 +43,4 @@ def save_pdf_pages_as_png(pdf_path, output_dir="images"):
         page.save(f"{output_dir}/page-{page_number}.png")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
