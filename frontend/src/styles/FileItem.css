@@ -1,0 +1,66 @@
+/* FileItem.module.css */
+
+.fileListItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #2c2c2c;
+  border-radius: 8px; /* Rounded corners */
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  color: #fff;
+  font-family: 'Roboto', Arial, sans-serif; /* Updated font */
+}
+
+.file-checkbox {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  appearance: none;
+  background-color: #444;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.file-checkbox:checked {
+  background-color: #00bfff;
+  border-color: #00bfff;
+}
+
+.file-list-name {
+  flex-grow: 1;
+  padding: 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  margin-left: 10px; /* Adds spacing between checkbox and file name */
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  margin-left: 10px; /* Space between icons */
+}
+
+.icon-button i {
+  font-size: 16px;
+}
+
+.icon-button:hover {
+  color: #00bfff;
+}

@@ -3,35 +3,27 @@ import './Scanner.css';
 
 export const Scanner = () => {
   const containerRef = useRef(null);
-  const isRunning = useRef(false);
   const currentName = useRef('');
   const currentFile = useRef('');
   const result = useRef(null);
   const resultCtx = useRef(null);
-  const image = useRef(null);
-  const scanner = useRef(null);
-  const openCvURL = 'https://docs.opencv.org/4.7.0/opencv.js';
 
-  const [loadedOpenCV, setLoadedOpenCV] = useState(false);
   const [fileData, setFormData] = useState([]);
   const [fileNames, setFileNames] = useState([]);
   const [imgSrc, setImgSrc] = useState('');
   const [data, setData] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [editedData, setEditedData] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [useCentering, setUseCentering] = useState(false);
   const [progress, setProgress] = useState(0); // State for progress bar
   const fileInputRef = useRef(null);
 
-  //Upond file upload If it is a PDF it writes the name of the file to the canvas, otherwise it displays the image on the canvas
+  //Upon file upload If it is a PDF it writes the name of the file to the canvas, otherwise it displays the image on the canvas
   const handleFileUpload = (file) => {
     if (!file) return;
     currentName.current = file.name;
     if (file.type === 'application/pdf') {
       currentFile.current = file;
-      resultCtx.current.font = '20px serif';
-      resultCtx.current.fillText(file.name, 10, 50);
     } else if (useCentering === false) {
       currentFile.current = file;
       setImgSrc(URL.createObjectURL(file));
@@ -59,76 +51,10 @@ export const Scanner = () => {
     setEditedData(event.target.value);
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+
 
   const toggleCentering = () => {
     setUseCentering(!useCentering);
-  };
-
-  useEffect(() => {
-    document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
-  }, [isDarkMode]);
-
-  useEffect(() => {
-    loadOpenCv(() => {
-      // sets up canvases with text on the Canvas, This will be replaced when the user uploads an Image. This is free to be changed.
-      result.current = document.getElementById('result');
-      resultCtx.current = setupCanvas(result.current);
-      image.current = document.getElementById('hiddenImage');
-      resultCtx.current.font = '16px serif';
-      resultCtx.current.fillText("Welcome to MathEdu a project with the goal to help teachers quickly and efficently grade student's work.", 75, 50);
-      resultCtx.current.fillText("To get started upload a file and then select add file, feel free to add as many files as you want. ", 100, 75);
-      resultCtx.current.fillText("Whenever you're ready select \"Send to be Processed.\" And wait about 25 seconds per page", 105, 100);
-      resultCtx.current.fillText("There is also a built in scanner for images taken on phones or images not scanned,", 120, 125);
-      resultCtx.current.fillText("If you are using one of those select the checkbox before adding the file.", 140, 150);
-      resultCtx.current.fillText("", 140, 175);
-      //eslint has to be disabled if there is no line below you'll get wrong errors. Because jscanify is loaded after launch.
-      /* eslint-disable */
-      scanner.current = new jscanify();
-    });
-  }, []);
-
-
-//Sets the pixel density of the canvas. These values can be tweaked a little but be careful because they can become too sharp.
-  const setupCanvas = (canvas) => {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    return ctx;
-  };
-
-//extracts image from the canvas after the image has been loaded
-  useEffect(() => {
-    //timeout is needed in case the image takes a while to load
-    if (imgSrc === '') return;
-    if (document.getElementById('hiddenImage').complete) {
-      extractFileFromCanvas();
-    } else {
-      setTimeout(extractFileFromCanvas, 1000);
-    }
-  }, [imgSrc]);
-
-  //uses openCV to  extract the document from the image
-  const extractFileFromCanvas = () => {
-    result.current.width = image.current.naturalWidth;
-    result.current.height = image.current.naturalHeight;
-    resultCtx.current.drawImage(
-      image.current,
-      0,
-      0,
-      image.current.naturalWidth,
-      image.current.naturalHeight
-    );
-    const resultImage = scanner.current.extractPaper(result.current, 500, 1000);
-    resultCtx.current.drawImage(resultImage, 0, 0, result.current.width, result.current.height);
-    result.current.style.width = '400px';
-    result.current.style.height = '500px';
-    isRunning.current = false;
   };
 
 
@@ -214,26 +140,6 @@ export const Scanner = () => {
     setData(result);
   };
 
-  const loadOpenCv = (onComplete) => {
-    const isScriptPresent = !!document.getElementById('open-cv');
-    if (isScriptPresent || loadedOpenCV) {
-      setLoadedOpenCV(true);
-      onComplete();
-    } else {
-      const script = document.createElement('script');
-      script.id = 'open-cv';
-      script.src = openCvURL;
-
-      script.onload = function () {
-        setTimeout(function () {
-          onComplete();
-        }, 1000);
-        setLoadedOpenCV(true);
-      };
-      document.body.appendChild(script);
-    }
-  };
-
 
   const fetchImageAsFile = async (imagePath, fileName) => {
     const response = await fetch(imagePath);
@@ -258,19 +164,6 @@ export const Scanner = () => {
     <>
       <div className="scanner-container">
         <div>
-          {!loadedOpenCV && (
-            <div>
-              <h2>Loading OpenCV...</h2>
-            </div>
-          )}
-
-          <input
-            type="checkbox"
-            className="dark-mode-toggle"
-            id="dark-mode-toggle"
-            checked={isDarkMode}
-            onChange={toggleDarkMode}
-          />
 
           {isLoading && ( // Show the loading animation if isLoading is true
             <div className="loading-container">
@@ -311,7 +204,6 @@ export const Scanner = () => {
               <option value="14">Image 14</option>
               <option value="15">Image 15</option>
               <option value="16">Image 16</option>
-              {/* Add more options as needed */}
             </select>
           </div>
 

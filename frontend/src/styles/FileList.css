@@ -1,0 +1,13 @@
+/* FileList.css */
+
+.file-list {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: stretch; /* Ensure items take up full width */
+    width: 100%; /* Make the file list container as wide as possible */
+    max-width: 800px; /* Increase max-width to make the list wider */
+    margin: 0 auto; /* Center the file list on the page */
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
