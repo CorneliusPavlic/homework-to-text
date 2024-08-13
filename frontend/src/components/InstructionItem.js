@@ -15,11 +15,13 @@ const InstructionItem = ({ step, title, description, children}) => {
         <span className={`arrow ${isOpen ? 'up' : 'down'}`}>&#9662;</span>
       </div>
       <p className="description">{description}</p>
-      {isOpen && (
-        <div className="instruction-content">
-          {children}
-        </div>
-      )}
+      <div
+        className="instruction-content"
+        style={{ display: isOpen ? 'block' : 'none' }}
+        >
+        {children}
+      </div>
+
     </div>
   );
 };

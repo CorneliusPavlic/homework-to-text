@@ -9,6 +9,15 @@
     max-width: 100%;
   }
   
+  .download-link {
+    color: #62B6E7;
+    text-decoration: none;
+  }
+
+  .download-link:hover {
+    color: #356f91;
+  }
+
   .instruction-item {
     margin: 30px 0;
     border-top: 1px dashed #aaa;

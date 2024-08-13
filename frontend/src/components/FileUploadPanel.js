@@ -5,9 +5,11 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles }) => {
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploadResults, setUploadResults] = useState([]);
-
   const fileInputRef = useRef(null);
   const prevFilesLengthRef = useRef(0); // Store previous length of files array
+
+
+
   const uploadFile = async (file, index) => {
     console.log("")
     if (!file) {
@@ -58,6 +60,7 @@ const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles }) => {
   const handleFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
     onAddMoreFiles(newFiles);
+    // uploadFile(newFiles[0], files.length);
   };
 
   const triggerFileInput = () => {
@@ -67,10 +70,10 @@ const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles }) => {
 const deleteFile = (index) => {
     const newFiles = [...files];
     newFiles.splice(index, 1);
-    console.log(newFiles);
     onAddMoreFiles(newFiles, false);
 }
 const startUpload = () => {
+  console.log("the upload is starting")
   const lastIndex = files.length - 1;
 
   if (lastIndex >= 0) {
@@ -85,7 +88,6 @@ const startUpload = () => {
 
 
 useEffect(() => {
-    console.log("This is the probllem right here")
     if (files.length > prevFilesLengthRef.current) {
       startUpload();
     }
@@ -102,14 +104,14 @@ useEffect(() => {
           <div key={index} className="file-item">
             <img src={URL.createObjectURL(file)} alt={file.name} className="file-thumbnail" />
             <span className="file-name">{file.name}</span>
+
+            <div className="progress-container">
+
             <div className="progress-bar">
               <div
                 className="progress"
                 style={{ width: `${uploadProgress[index] || 0}%` }}
               ></div>
-            </div>
-            <div className="upload-status">
-              {uploadProgress[index] === 100 ? "Complete" : "Uploading..."}
             </div>
             <button
               className="delete-button"
@@ -117,6 +119,10 @@ useEffect(() => {
             >
               <FontAwesomeIcon icon={faTrash} />
             </button>
+            </div>
+            <div className="upload-status">
+              {uploadProgress[index] === 100 ? "Complete" : "Uploading..."}
+            </div>
           </div>
         ))}
       </div>

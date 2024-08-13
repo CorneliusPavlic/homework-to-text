@@ -24,6 +24,8 @@
   .panel-title {
     font-weight: bold;
     font-size: 1.2rem;
+    margin-left:auto;
+    margin-right:auto;
   }
   
   .file-list {
@@ -31,14 +33,18 @@
     flex-wrap: wrap;
     gap: 10px;
   }
-  
+
   .file-item {
     background-color: white;
     border-radius: 5px;
     padding: 10px;
-    width: 100px;
+    width: 125px;
     text-align: center;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  }
+
+  .file-item:hover {
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
   }
   
   .file-thumbnail {
@@ -60,7 +66,8 @@
     background-color: #ddd;
     border-radius: 5px;
     height: 5px;
-    margin-bottom: 5px;
+    margin-bottom: auto;
+    margin-top: auto;
   }
   
   .progress {
@@ -82,7 +89,7 @@
   }
   
   .add-more-button {
-    background-color: #007bff;
+    background-color: #62B6E7;
     color: white;
     padding: 8px 15px;
     border: none;
@@ -90,27 +97,27 @@
     cursor: pointer;
   }
   
+  .add-more-button:hover {
+    background-color: #356f91;
+  }
+
+  
   .progress-info {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     color: #333;
   }
   
+  .progress-container {
+    display:flex;
+    flex-direction: horizontal;
 
-  .file-item {
-    position: relative;
-    background-color: white;
-    border-radius: 5px;
-    padding: 10px;
-    width: 120px;
-    text-align: center;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    margin: 10px;
   }
   
   .delete-button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
+    position: relative;
+    z-index: 5;
+    margin-left:auto;
+    margin-right:0px;
     background-color: transparent;
     border: none;
     color: #d9534f;
