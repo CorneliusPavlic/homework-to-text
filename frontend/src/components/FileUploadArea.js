@@ -3,39 +3,33 @@ import '../styles/FileUploadArea.css';
 import uploadImage from '../assets/drag-icon.png';
 import FileUploadPanel from './FileUploadPanel';
 
-const FileUploadArea = ({ files, setFiles, uploadedFiles, setUploadedFiles }) => {
+const FileUploadArea = ({ files, setFiles, uploadedFiles, setUploadedFiles, restoreDeletedItems }) => {
   const fileInputRef = useRef(null);
 
   const handleFileDrop = (event) => {
-    console.log('a');
     event.preventDefault();
     const newFiles = Array.from(event.dataTransfer.files);
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
   const handleFileChange = (event) => {
-    console.log('b');
     const newFiles = Array.from(event.target.files);
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
   const handleDragOver = (event) => {
-    console.log('c');
     event.preventDefault();
   };
 
   const triggerFileInput = () => {
-    console.log('d');
     fileInputRef.current.click();
   };
 
   const handleUploadComplete = (fileName, result) => {
-    console.log('e');
-    setUploadedFiles((prev) => [...prev, { fileName, result }]);
+    setUploadedFiles((prev) => [...prev, { fileName, result, visible: true }]);
   };
 
   const handleAddMoreFiles = (newFiles, keepOldFiles=true) => {
-    console.log('f');
     if(keepOldFiles){
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
@@ -69,6 +63,7 @@ const FileUploadArea = ({ files, setFiles, uploadedFiles, setUploadedFiles }) =>
           files={files}
           onUploadComplete={handleUploadComplete}
           onAddMoreFiles={handleAddMoreFiles}
+          restoreDeletedItems={restoreDeletedItems}
         />
       )}
     </div>

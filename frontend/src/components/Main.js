@@ -20,8 +20,16 @@ const Main = () => {
   };
 
   const handleDeleteFile = (index) => {
-    setUploadedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setUploadedFiles((prevFiles) =>
+      prevFiles.map((file, i) =>
+        i === index ? { ...file, visible: false } : file
+      )
+    );
   };
+
+  const restoreDeletedItems = (fileName) => {
+    setUploadedFiles((prevFiles) => prevFiles.map((file) => file.fileName === fileName ? { ...file, visible: true } : file));
+};
 
   const handleViewResult = (result) => {
     setCurrentResult(result.result);
@@ -52,12 +60,15 @@ const Main = () => {
     setImageIndex((prevIndex) => (prevIndex >= totalImages ? 1 : prevIndex + 1));
   };
 
-
+ const logUploadedFiles = () => {
+  console.log(uploadedFiles);
+ }
   return (
     <main>
+    <button onClick={logUploadedFiles}>Test</button>
       <InstructionItem
         step="1"
-        title="Capture"
+        title="Overview"
         description="Take photos of your student's work. A scan of the entire page works best, but a picture will also work."
       >
         <img src={cameraIcon} alt="Camera Icon" style={{ display: 'block', margin: '20px auto' }} />
@@ -65,20 +76,23 @@ const Main = () => {
 
       <InstructionItem
         step="2"
-        title="Upload"
+        title="Capture & Upload"
         description={
         <>
+        <p>
         Upload the photo or file(s) here. Add as many files as you want! Don't have your own files? 
         <a className="download-link" href="#" onClick={handleDownloadClick}> Click Here</a> You'll get a new file to test each time.
+        After Capturing and Uploading student's work, you will get text that can be copied and pasted into a GPT or other machine learning tool. 
+        </p>
         </>}
       >
-        <FileUploadArea  files={files} setFiles={setFiles}  uploadedFiles={uploadedFiles} setUploadedFiles={setUploadedFiles} onFileSelect={handleFileUpload} />
+        <FileUploadArea  files={files} setFiles={setFiles}  uploadedFiles={uploadedFiles} setUploadedFiles={setUploadedFiles} restoreDeletedItems={restoreDeletedItems} onFileSelect={handleFileUpload} />
       </InstructionItem>
 
       <InstructionItem
         step="3"
-        title="Organize"
-        description="Organize and use processed files."
+        title="Grab your text"
+        description=""
       >
         <FileList
           uploadedFiles={uploadedFiles}

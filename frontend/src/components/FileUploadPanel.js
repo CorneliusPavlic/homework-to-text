@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import '../styles/FileUploadPanel.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles }) => {
+const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles, restoreDeletedItems}) => {
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploadResults, setUploadResults] = useState([]);
   const fileInputRef = useRef(null);
@@ -11,7 +11,6 @@ const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles }) => {
 
 
   const uploadFile = async (file, index) => {
-    console.log("")
     if (!file) {
       console.error('No file provided for upload');
       return;
@@ -20,37 +19,22 @@ const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles }) => {
     const formData = new FormData();
     formData.append('file', file);
   
-    // Log to check if file is appended correctly
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ', ' + pair[1]);
-    }
-  
+
     try {
-      setTimeout(() => {
-        // Simulate a JSON response from a server
-        const result = {
-          result: "This is a test"
-        };
-      
-        // Update the state with the result
+      const response = await fetch('/api/sendFiles', {
+        method: 'POST',
+        body: formData, 
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
         setUploadResults((prev) => [...prev, { fileName: file.name, result }]);
         onUploadComplete(file.name, result); // Notify parent component
         setUploadProgress((prev) => ({ ...prev, [index]: 100 }));
-      }, 5000);
-    //   const response = await fetch('http://localhost:5000/api/sendFiles', {
-    //     method: 'POST',
-    //     body: formData,  // Note: Do not manually set Content-Type headers
-    //   });
-  
-    //   if (response.ok) {
-    //     const result = await response.json();
-    //     setUploadResults((prev) => [...prev, { fileName: file.name, result }]);
-    //     onUploadComplete(file.name, result); // Notify parent component
-    //     setUploadProgress((prev) => ({ ...prev, [index]: 100 }));
-    //   } else {
-    //     console.error('Upload failed:', response.statusText);
-    //     setUploadProgress((prev) => ({ ...prev, [index]: 0 }));
-    //   }
+      } else {
+        console.error('Upload failed:', response.statusText); 
+        setUploadProgress((prev) => ({ ...prev, [index]: 0 }));
+      }
      } catch (error) {
       console.error('Upload error:', error);
       setUploadProgress((prev) => ({ ...prev, [index]: 0 }));
@@ -73,7 +57,6 @@ const deleteFile = (index) => {
     onAddMoreFiles(newFiles, false);
 }
 const startUpload = () => {
-  console.log("the upload is starting")
   const lastIndex = files.length - 1;
 
   if (lastIndex >= 0) {
@@ -102,7 +85,7 @@ useEffect(() => {
       <div className="file-list">
         {files.map((file, index) => (
           <div key={index} className="file-item">
-            <img src={URL.createObjectURL(file)} alt={file.name} className="file-thumbnail" />
+            <img src={URL.createObjectURL(file)} alt={file.name} className="file-thumbnail" onClick={() => restoreDeletedItems(file.name)}/>
             <span className="file-name">{file.name}</span>
 
             <div className="progress-container">

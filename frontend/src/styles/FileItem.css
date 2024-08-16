@@ -14,6 +14,10 @@
   font-family: 'Roboto', Arial, sans-serif; /* Updated font */
 }
 
+.icon-Container {
+  display: flex;
+  align-items: center;
+}
 .file-checkbox {
   margin-right: 10px;
   width: 20px;
@@ -40,14 +44,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 14px;
+  font-size: clamp(8px, 2.4vw, 20px);
   margin-left: 10px; /* Adds spacing between checkbox and file name */
 }
 
-.icon-container {
-  display: flex;
-  align-items: center;
-}
 
 .icon-button {
   background: none;

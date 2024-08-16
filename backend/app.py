@@ -1,67 +1,58 @@
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 from flask_cors import CORS, cross_origin
+import uuid
 import os
-from dotenv import load_dotenv
-import google.generativeai as genai
 from PIL import Image
 from pdf2image import convert_from_path
 from functions import DocScanner
 from functions import make_prediction
 
-load_dotenv()
 app = Flask(__name__)
 
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
-
-
-
 @app.route('/api/sendFiles', methods=['POST'])
-@cross_origin(origins="http://localhost:3000")
 def upload_file():
     result_string = ""
-    return jsonify({"result": "I'm so freaking done rn"}), 200
-    #     # Check if the 'images' directory exists, if not, create it
-    # if not os.path.exists('images'):
-    #     os.makedirs('images')
+    # Generate a unique directory name for this upload session
+    unique_dir = os.path.join('uploads', str(uuid.uuid4()))
+    os.makedirs(unique_dir, exist_ok=True)
+    try:
+        # Get the list of files from the request
+        files = request.files.getlist('file')
+        print("Received files:", files)
+        scanner = DocScanner(False)
+        
+        if not files:
+            return jsonify({"error": "No files uploaded"}), 400
 
-    #     # Get the list of files from the request
-    # files = request.files.getlist('file')
-    # print("Received files:", files)
-    # scanner = DocScanner(False)
-    # if not files:
-    #     return jsonify({"error": "No files uploaded"}), 400
+        for file in files:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(unique_dir, filename)
+            file.save(file_path)
 
-    #     # Save each file to the 'images' directory
-    # print(f"We have {files}, Files is {len(files)} long")
-    # for file in files:
-    #     filename = secure_filename(file.filename)
-    #     file_path = os.path.join('images', filename)
-    #     print(f"Saving file to {file_path}")
-    #     file.save(file_path)
+            if file_path.endswith(".pdf"):
+                save_pdf_pages_as_png(file_path)
 
-    #         # If the file is a PDF, convert it to images (assuming this function is implemented)
-    #     if file_path.endswith(".pdf"):
-    #         save_pdf_pages_as_png(file_path)  # Convert PDF pages to PNG
-    # for file in os.listdir('images'):
-    #     file_path = os.path.join('images', filename)
-    #     print(file_path)
-    #     scanner.scan(file_path)
-    #     # Make predictions on the saved files
-    # for i, file in enumerate(os.listdir('images')):
-    #     file_path = os.path.join('images', file)
-    #     print(f"Processing file {file_path}")
-    #     result_string += f"Page {str(i+1)}: \n\n"
-    #     result_string += make_prediction(file_path)  # Assuming this function returns a string
-    #     result_string += "\n\n"
+        # Scan and make predictions on the saved files
+        for file in os.listdir(unique_dir):
+            file_path = os.path.join(unique_dir, file)
+            scanner.scan(file_path)
+            
+        for i, file in enumerate(os.listdir(unique_dir)):
+            file_path = os.path.join(unique_dir, file)
+            result_string += f"Page {str(i+1)}: \n\n  {make_prediction(file_path)} \n\n"
 
-    # # Clean up the 'images' directory
-    # for file in os.listdir('images'):
-    #     os.remove(os.path.join('images', file))
-    # print("Cleaned up the 'images' directory.")
+        # Clean up by deleting the unique directory and its contents
+        for file in os.listdir(unique_dir):
+            os.remove(os.path.join(unique_dir, file))
+        os.rmdir(unique_dir)
 
-    # return jsonify({"result": result_string}), 200
-
+        return jsonify({"result": result_string}), 200
+    except Exception as e:
+        for file in os.listdir(unique_dir):
+            os.remove(os.path.join(unique_dir, file))
+            os.rmdir(unique_dir)
+        return jsonify({"error": "Something went wrong with your file please try again"}), 500
 
 
 def save_pdf_pages_as_png(pdf_path, output_dir="images"):
