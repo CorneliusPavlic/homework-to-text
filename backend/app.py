@@ -62,3 +62,4 @@ def save_pdf_pages_as_png(pdf_path, output_dir="images"):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
