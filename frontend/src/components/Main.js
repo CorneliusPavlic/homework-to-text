@@ -60,12 +60,9 @@ const Main = () => {
     setImageIndex((prevIndex) => (prevIndex >= totalImages ? 1 : prevIndex + 1));
   };
 
- const logUploadedFiles = () => {
-  console.log(uploadedFiles);
- }
+
   return (
     <main>
-    <button onClick={logUploadedFiles}>Test</button>
       <InstructionItem
         step="1"
         title="Overview"

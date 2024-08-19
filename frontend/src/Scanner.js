@@ -116,7 +116,6 @@ export const Scanner = () => {
         setIsLoading(false); 
         setProgress(100); // Set progress to 100% on success
         const data = await response.text();
-        console.log(data);
         setData(data);
         setEditedData(data);
         const resultElement = document.getElementById('math');

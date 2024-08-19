@@ -2,9 +2,6 @@ import React from 'react';
 import FileItem from './FileItem';
 import '../styles/FileList.css';
 const FileList = ({ uploadedFiles, onDelete, onView }) => {
-  React.useEffect(() => {
-    console.log(uploadedFiles);
-  }, [uploadedFiles]);
   return (
 <div className="file-list">
   {[...new Map(uploadedFiles.map(item => [item.fileName, item])).values()].map((item, index) => {
