@@ -25,6 +25,7 @@ def box_area(box):
 
 
 def combine_two_closest_boxes(mergable_boxes, distance_for_merge=400):
+    if(mergable_boxes == []): return None, None, None
     for i, box in enumerate(mergable_boxes):
         shortest_distance = (10000000, None)
         for j, destination in enumerate(mergable_boxes):
@@ -252,7 +253,14 @@ def segment_fractions(path, merge_margin_vertical=30, merge_margin_horizontal=1,
         img = path
     else:
         img = cv2.imread(path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY_INV)
+    horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 3))
+    detected_lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, horizontal_kernel, iterations=2)
+    dilated_lines = cv2.dilate(detected_lines, horizontal_kernel, iterations=1)
+    processed_image = cv2.subtract(binary, dilated_lines)
+    img = cv2.bitwise_not(processed_image)
     ret, thresh_binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     img = cv2.cvtColor(thresh_binary, cv2.COLOR_GRAY2BGR)
 
