@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react';
 import InstructionItem from './InstructionItem';
 import cameraIcon from '../assets/camera-icon.png';
 import FileUploadArea from './FileUploadArea';
-import FileList from './FileList';
 import ResultModal from './ResultModal';
 import ErrorModal from './ErrorModal';
+import ResultList from './ResultList';
+
 const Main = () => {
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -15,12 +16,15 @@ const Main = () => {
   const [errors, setErrors] = useState(null); // State to track errors
   const totalImages = 16; // Total number of images
 
+
+  //Passed into the FileUploadArea component. It takes the uploaded file and puts it into the files State.
   const handleFileUpload = (event) => {
     const uploadedFiles = Array.from(event.target.files);
     setFiles([...files, ...uploadedFiles]);
   };
 
-  const handleDeleteFile = (index) => {
+  //Passed into the ResultList component. Hides the result from the list when the delete button is clicked. content is not deleted so it can be retrieved without a seperate API call.
+  const handleDeleteResult = (index) => {
     setUploadedFiles((prevFiles) =>
       prevFiles.map((file, i) =>
         i === index ? { ...file, visible: false } : file
@@ -28,19 +32,23 @@ const Main = () => {
     );
   };
 
+  //Passed into the FileUploadPanel component. Restores the result associated with the file name.
   const restoreDeletedItems = (fileName) => {
     setUploadedFiles((prevFiles) => prevFiles.map((file) => file.fileName === fileName ? { ...file, visible: true } : file));
 };
 
+  //Opens modal with the result when the view button is clicked.
   const handleViewResult = (result) => {
     setCurrentResult(result.result);
     setIsModalOpen(true);
   };
 
+  //Closes the modal when close button is clicked
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
+  //Handles the download link. It will download a new file each time the link is clicked. looping through however many files are specified with the totalImages variable.
   const handleDownloadClick = (event) => {
     event.preventDefault();
 
@@ -92,9 +100,9 @@ const Main = () => {
         title="Grab your text"
         description=""
       >
-        <FileList
+        <ResultList
           uploadedFiles={uploadedFiles}
-          onDelete={handleDeleteFile}
+          onDelete={handleDeleteResult}
           onView={handleViewResult}
         />
       </InstructionItem>

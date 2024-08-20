@@ -1,6 +1,6 @@
 /* FileItem.module.css */
 
-.fileListItem {
+.ResultListItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -18,27 +18,8 @@
   display: flex;
   align-items: center;
 }
-.file-checkbox {
-  margin-right: 10px;
-  width: 20px;
-  height: 20px;
-  appearance: none;
-  background-color: #444;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  outline: none;
-}
 
-.file-checkbox:checked {
-  background-color: #00bfff;
-  border-color: #00bfff;
-}
-
-.file-list-name {
+.Result-list-name {
   flex-grow: 1;
   padding: 0 10px;
   white-space: nowrap;

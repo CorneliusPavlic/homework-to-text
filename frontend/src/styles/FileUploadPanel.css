@@ -57,6 +57,10 @@
   }
   
   .file-name {
+    white-space: normal; /* allows the text to wrap */
+    word-wrap: break-word; /* breaks long words to fit within the div */
+    width: 100%; /* ensures the span fills the div */
+    display: inline-block; /* keeps the span inline while allowing it to expand */
     font-size: 0.8rem;
     color: #333;
     margin-bottom: 5px;

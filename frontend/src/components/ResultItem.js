@@ -1,12 +1,12 @@
 import React from 'react';
-import '../styles/FileItem.css';
+import '../styles/ResultItem.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 
-const FileItem = ({ fileName, onDelete, onView }) => {
+const ResultItem = ({ fileName, onDelete, onView }) => {
   return (
-    <div className="fileListItem">
-      <span className="file-list-name">{fileName}</span>
+    <div className="ResultListItem">
+      <span className="Result-list-name">{fileName}</span>
       <div className="icon-Container">
         <button className="icon-button" onClick={onView}>
           <FontAwesomeIcon icon={faEye} />
@@ -19,4 +19,4 @@ const FileItem = ({ fileName, onDelete, onView }) => {
   );
 };
 
-export default FileItem;
+export default ResultItem;

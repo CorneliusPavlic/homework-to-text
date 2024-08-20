@@ -1,6 +1,6 @@
 /* FileList.css */
 
-.file-list {
+.result-list {
     display: flex;
     justify-content: center;
     column-gap: 20px;
