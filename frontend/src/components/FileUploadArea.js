@@ -3,7 +3,7 @@ import '../styles/FileUploadArea.css';
 import uploadImage from '../assets/drag-icon.png';
 import FileUploadPanel from './FileUploadPanel';
 
-const FileUploadArea = ({ files, setFiles, uploadedFiles, setUploadedFiles, restoreDeletedItems }) => {
+const FileUploadArea = ({ files, setFiles, uploadedFiles, setUploadedFiles, restoreDeletedItems, setErrors }) => {
   const fileInputRef = useRef(null);
 
   const handleFileDrop = (event) => {
@@ -64,6 +64,7 @@ const FileUploadArea = ({ files, setFiles, uploadedFiles, setUploadedFiles, rest
           onUploadComplete={handleUploadComplete}
           onAddMoreFiles={handleAddMoreFiles}
           restoreDeletedItems={restoreDeletedItems}
+          setErrors={setErrors}
         />
       )}
     </div>

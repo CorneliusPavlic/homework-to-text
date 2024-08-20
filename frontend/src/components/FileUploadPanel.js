@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import '../styles/FileUploadPanel.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles, restoreDeletedItems}) => {
+const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles, restoreDeletedItems, setErrors}) => {
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploadResults, setUploadResults] = useState([]);
   const fileInputRef = useRef(null);
@@ -33,10 +33,12 @@ const FileUploadPanel = ({ files, onUploadComplete, onAddMoreFiles, restoreDelet
         setUploadProgress((prev) => ({ ...prev, [index]: 100 }));
       } else {
         console.error('Upload failed:', response.statusText); 
+        setErrors('Upload failed:', response.statusText);
         setUploadProgress((prev) => ({ ...prev, [index]: 0 }));
       }
      } catch (error) {
       console.error('Upload error:', error);
+      setErrors('Upload error:', error);
       setUploadProgress((prev) => ({ ...prev, [index]: 0 }));
      }
   };

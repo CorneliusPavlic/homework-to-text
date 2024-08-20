@@ -5,13 +5,14 @@ import cameraIcon from '../assets/camera-icon.png';
 import FileUploadArea from './FileUploadArea';
 import FileList from './FileList';
 import ResultModal from './ResultModal';
-
+import ErrorModal from './ErrorModal';
 const Main = () => {
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentResult, setCurrentResult] = useState('');
   const [imageIndex, setImageIndex] = useState(1); // State to track the current image index
+  const [errors, setErrors] = useState(null); // State to track errors
   const totalImages = 16; // Total number of images
 
   const handleFileUpload = (event) => {
@@ -83,7 +84,7 @@ const Main = () => {
         </p>
         </>}
       >
-        <FileUploadArea  files={files} setFiles={setFiles}  uploadedFiles={uploadedFiles} setUploadedFiles={setUploadedFiles} restoreDeletedItems={restoreDeletedItems} onFileSelect={handleFileUpload} />
+        <FileUploadArea  files={files} setFiles={setFiles}  uploadedFiles={uploadedFiles} setUploadedFiles={setUploadedFiles} restoreDeletedItems={restoreDeletedItems} onFileSelect={handleFileUpload} setErrors={setErrors}/>
       </InstructionItem>
 
       <InstructionItem
@@ -103,6 +104,13 @@ const Main = () => {
           resultText={currentResult}
           onClose={closeModal}
         />)}
+
+      {errors && (
+        <ErrorModal
+          errorText={errors}
+          setErrors={setErrors} />
+      )}
+
     </main>
   );
 };
