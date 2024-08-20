@@ -1,0 +1,137 @@
+.file-upload-panel {
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    padding: 15px;
+    max-width: 600px;
+    margin: 20px auto;
+  }
+  
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .cancel-button {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  .panel-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  
+  .file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .file-item {
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+    width: 125px;
+    text-align: center;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  }
+
+  .file-item:hover {
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+  }
+  
+  .file-thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+  
+  .file-name {
+    font-size: 0.8rem;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 5px;
+    height: 5px;
+    margin-bottom: auto;
+    margin-top: auto;
+  }
+  
+  .progress {
+    height: 5px;
+    background-color: #4caf50;
+    border-radius: 5px;
+  }
+  
+  .upload-status {
+    font-size: 0.7rem;
+    color: #666;
+  }
+  
+  .panel-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+  }
+  
+  .add-more-button {
+    background-color: #62B6E7;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-more-button:hover {
+    background-color: #356f91;
+  }
+
+  
+  .progress-info {
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .progress-container {
+    display:flex;
+    flex-direction: horizontal;
+
+  }
+  
+  .delete-button {
+    position: relative;
+    z-index: 5;
+    margin-left:auto;
+    margin-right:0px;
+    background-color: transparent;
+    border: none;
+    color: #d9534f;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .delete-button:hover {
+    color: #c9302c;
+  }
+  
+  .file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }

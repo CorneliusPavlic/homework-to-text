@@ -40,10 +40,7 @@ def upload_file():
             
         for i, file in enumerate(os.listdir(unique_dir)):
             file_path = os.path.join(unique_dir, file)
-            prediction = make_prediction(file_path)
-            if prediction == "":
-                prediction = "No text found in this page"
-            result_string += f"Page {str(i+1)}: \n\n  {[prediction]} \n\n"
+            result_string += f"Page {str(i+1)}: \n\n  {make_prediction(file_path)} \n\n"
 
         # Clean up by deleting the unique directory and its contents
         for file in os.listdir(unique_dir):

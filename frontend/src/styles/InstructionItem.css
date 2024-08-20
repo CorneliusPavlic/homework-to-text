@@ -1,0 +1,32 @@
+.instruction-item {
+    margin: 30px 0;
+    border-top: 1px dashed #aaa;
+    padding-top: 20px;
+  }
+  
+  .instruction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor:pointer;
+  }
+  
+  .instruction-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .instruction-content {
+    margin-top: 15px;
+    padding-left: 20px;
+  }
+  
+  .arrow {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+  }
+  
+  .arrow.up {
+    transform: rotate(180deg);
+  }
+  

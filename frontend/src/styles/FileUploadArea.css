@@ -1,0 +1,26 @@
+.file-upload-container {
+  width: 100%;
+}
+
+.file-upload-area {
+  position: relative;
+  width: 100%;
+  max-width: 300px; /* Adjust as needed */
+  margin: 20px auto;
+  cursor: pointer;
+}
+
+.upload-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+}
+
+.file-upload-area:hover .upload-image {
+  opacity: 0.8;
+}
+
+.file-upload-area:active .upload-image {
+  opacity: 0.6;
+}
